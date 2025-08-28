@@ -1,0 +1,24 @@
+Wk2 Plot - Eagles
+================
+Norah Saarman
+Sept 4, 2025
+
+``` r
+# Bald eagle recovery data
+year <- c(1942, 1943,1944,1945,1947,1948, 1950, 1952,1955,1958, 1963, 1974, 1981, 1982, 1984, 1986, 1987, 1988, 1989, 1990,
+          1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000)
+FLsf <- 40
+pairs <- c((115*FLsf),(135*FLsf),(140*FLsf),(110*FLsf),(160*FLsf),(100*FLsf), (35*FLsf),(20*FLsf),(10*FLsf),(5*FLsf),417, 791, 1188, 1480, 1757, 1875, 2238, 2475, 2680, 3035,
+           3399, 3749, 4015, 4449, 4712, 5094, 5295, 5748, 6104, 6471)
+
+# Plot
+plot(year, pairs, type="b", pch=19, lwd=2,
+     xlab="Year", ylab="Number of Bald Eagle Pairs in Lower 48",
+     main = "Eagles Soar Again: From Near-Extinction \n to Thousands Strong — Thanks to 1972 DDT Ban")
+```
+
+![](Wk2_plot_eagles_files/figure-gfm/recovery-1.png)<!-- -->
+
+``` r
+     #main="Eagle Decline (DDT start 1947) and Recovery (DDT banned 1972)")
+```

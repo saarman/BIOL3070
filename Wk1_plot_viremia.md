@@ -1,8 +1,13 @@
-# Day 1 Example Plot
+Wk1 Plot - Viremia
+================
+Norah Saarman
+Aug 28, 2025
+
+``` r
 # Import data and name columns
 viremia <- read.csv("viremia_data_full.csv") 
 colnames(viremia) <- c("Bird","n","Species",
-                       "Family","Order","1","3","4","6")
+            "Family","Order","1","3","4","6")
 
 # Choose some colors
 cols <- c("black","grey",rainbow(26)[4:26])  # rainbow colors
@@ -25,10 +30,11 @@ for(i in 2:nrow(viremia)){ # Add rows in loop
 legend("right", inset=c(-0.38,0),  legend=viremia$Bird, 
        col=cols,
        lty=1, lwd=2, cex=0.6,xpd=TRUE)  
+```
 
+![](Wk1_plot_viremia_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
 
-
-
+``` r
 # Totally extra, probably don't really have time for:
 # Compile by Order 
 n <- length(unique(viremia$Order))  # n = number of orders
@@ -65,4 +71,6 @@ for(i in 2:nrow(df)){
 legend("right", inset=c(-0.38,0), 
        legend=df$Order, col=cols, lty=1, 
        lwd=2, cex=0.8,xpd = TRUE)
+```
 
+![](Wk1_plot_viremia_files/figure-gfm/unnamed-chunk-2-1.png)<!-- -->
