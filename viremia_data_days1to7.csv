@@ -1,0 +1,26 @@
+Bird,n,Species,Family,Order,Day1,Day2,Day3,Day4,Day5,Day6,Day7
+Canada Goose,3,Branta canadensis,Anatidae,Anseriformes,2.8,5.3,4.5,3.4,1.9,1.7,1.7
+Mallard,2,Anas platyrhynchos,Anatidae,Anseriformes,6.1,5.7,6.7,5.1,4.7,1.7,1.7
+American Kestrel,2,Falco sparverius,Falconidae,Falconiformes,6.2,8.4,6.6,3.8,2.0,1.7,1.7
+Northern Bobwhite,3,Colinus virginianus,Odontophoridae,Galliformes,2.8,2.9,2.0,1.9,1.2,1.7,1.7
+Japanese Quail,3,Coturnix japonicus,Odontophoridae,Galliformes,1.7,1.7,2.8,3.4,3.1,2.2,1.7
+Ring-necked Pheasant,3,Phasianus colchicus,Phasianidae,Galliformes,2.1,2.8,2.6,1.8,1.2,1.7,1.7
+American Coot,1,Fulica americana,Rallidae,Gruiformes,1.7,1.7,3.4,4.6,2.8,1.7,1.7
+Killdeer,2,Charadrius vociferus,Charadriidae,Charadriiformes,6.2,7.5,8.1,4.9,2.6,1.7,1.7
+Ring-billed Gull,2,Larus delawarensis,Laridae,Charadriiformes,5.4,7.8,8.0,7.4,7.2,5.3,4.1
+Mourning Dove,3,Zenaida macroura,Columbidae,Columbiformes,4.8,5.9,6.3,5.6,3.6,1.7,1.7
+Rock Dove,6,Columba livia,Columbidae,Columbiformes,3.5,4.3,4.2,2.9,,,
+Monk Parakeet,3,Myiopsitta monachus,Psittacidae,Psittaciformes,2.8,3.6,3.5,1.7,1.7,1.7,1.7
+Budgerigar,3,Melopsittacus undulatus,Psittacidae,Psittaciformes,2.3,1.9,2.8,2.9,2.1,1.7,1.7
+Great Horned Owl,1,Bubo virginianus,Strigidae,Strigiformes,1.7,6.2,7.6,6.0,5.6,3.5,1.7
+Northern Flicker,1,Colaptes auratus,Picidae,Piciformes,3.9,4.9,5.4,3.9,1.7,1.7,1.7
+Blue Jay,4,Cyanocitta cristata,Corvidae,Passeriformes,8.5,11.1,12.1,10.5,9.0,4.0,1.7
+Black-billed Magpie,3,Pica hudsonia,Corvidae,Passeriformes,5.3,8.3,8.8,4.9,4.0,,1.7
+American Crow,8,Corvus brachyrhynchos,Corvidae,Passeriformes,5.8,8.7,9.9,10.2,10.0,8.2,1.7
+Fish Crow,9,Corvus ossifragus,Corvidae,Passeriformes,5.4,6.8,7.8,8.9,8.3,4.0,1.7
+American Robin,2,Turdus migratorius,Turdidae,Passeriformes,5.8,7.9,7.3,4.6,2.0,1.7,1.7
+European Starling,6,Sturnus vulgaris,Sturnidae,Passeriformes,5.9,8.6,6.2,2.3,1.7,1.7,1.7
+Red-winged Blackbird,3,Agelaius phoeniceus,Icteridae,Passeriformes,5.9,8.6,6.0,1.7,1.7,1.7,1.7
+Common Grackle,6,Quiscalus quiscula,Icteridae,Passeriformes,6.1,10.2,11.8,11.8,1.7,1.7,1.7
+House Finch,2,Carpodacus mexicanus,Fringillidae,Passeriformes,5.4,5.8,8.8,6.6,6.0,6.2,6.3
+House Sparrow,6,Passer domesticus,Passeridae,Passeriformes,7.8,9.8,10.3,10.3,8.4,1.8,4.5
