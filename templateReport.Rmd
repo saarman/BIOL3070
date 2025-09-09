@@ -25,8 +25,24 @@ summary(cars)
 
 You can also embed plots, for example:
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r pressure}
+plot(pressure) # this is a built in dataset
+
+# i'm practicing my commenting...
+# remember to put hash to get R to ignore
+# trying with red
+plot(pressure, col = "red")
 ```
 
 Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+  
+# New Header 1
+  
+```{r}
+#my code goes in her
+```
+
+
+## Subheader 1
+## Subheader 2
+
