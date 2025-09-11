@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ## Line Plot
 ```{r, warning=FALSE}
 # Import data and name columns
-viremia <- read.csv("viremia_data_days1to7.csv")
+viremia <- read.csv("./data/viremia_data_days1to7.csv")
 colnames(viremia) <- c("Bird","n","Species",
             "Family","Order","1","2","3","4","5","6","7")
 

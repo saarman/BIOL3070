@@ -21,7 +21,7 @@ Cx_pipiens_sl only, dropping other data
 ## Pip - Bloodmeal COi Sequences pipiens only
 
 ```{r blood-pip}
-blood_raw <- read.csv("bloodmeal_for_BIOL3070.csv", stringsAsFactors = FALSE)
+blood_raw <- read.csv("./data/bloodmeal_for_BIOL3070.csv", stringsAsFactors = FALSE)
 
 blood <- data.frame(
   date           = as.Date(blood_raw$Collection.Date, 
@@ -50,7 +50,7 @@ head(blood)
 ## Pip - WNV test status by mosquito pool
 
 ```{r pools-pip}
-pools_raw <- read.csv("mosquito_pools_WNV.csv", stringsAsFactors = FALSE)
+pools_raw <- read.csv("./data/mosquito_pools_WNV.csv", stringsAsFactors = FALSE)
 
 pools <- data.frame(
   agency_pool_num = pools_raw$agency_pool_num,
@@ -359,7 +359,7 @@ All data available, pip and tars Uniting WNV and Bloodmeal COi Sequences
 ## PipTar - Bloodmeal COi Sequences
 
 ```{r blood}
-blood_raw <- read.csv("bloodmeal_for_BIOL3070.csv", stringsAsFactors = FALSE)
+blood_raw <- read.csv("./data/bloodmeal_for_BIOL3070.csv", stringsAsFactors = FALSE)
 
 blood <- data.frame(
   date           = as.Date(blood_raw$Collection.Date, 
@@ -387,7 +387,7 @@ head(blood)
 ## PipTar - WNV test status by mosquito pool
 
 ```{r pools}
-pools_raw <- read.csv("mosquito_pools_WNV.csv", stringsAsFactors = FALSE)
+pools_raw <- read.csv("./data/mosquito_pools_WNV.csv", stringsAsFactors = FALSE)
 
 pools <- data.frame(
   agency_pool_num = pools_raw$agency_pool_num,
