@@ -1,362 +1,19 @@
 ---
-title: "Wk3 - Uniting WNV & Bloodmeal Datasets"
+title: "Wk3 - Bloodmeal Dataset"
 author: "Norah Saarman"
 date: "Sep 9, 2025"
 output:
   github_document:
     toc: true
-editor_options: 
-  markdown: 
-    wrap: 72
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# PIP ONLY
-
-Cx_pipiens_sl only, dropping other data
-
-## Pip - Bloodmeal COi Sequences pipiens only
-
-```{r blood-pip}
-blood_raw <- read.csv("./data/bloodmeal_for_BIOL3070.csv", stringsAsFactors = FALSE)
-
-blood <- data.frame(
-  date           = as.Date(blood_raw$Collection.Date, 
-                           tryFormats = c("%Y-%m-%d","%m/%d/%Y")),
-  year           = blood_raw$year,
-  month          = blood_raw$month,
-  lat            = blood_raw$Lat,
-  long           = blood_raw$Long,
-  loc_name       = blood_raw$Location,
-  loc_code       = blood_raw$site_code,
-  loc_year_month = blood_raw$loc_year_month,
-  mosq_species   = blood_raw$mosq_species,
-  host_species   = blood_raw$host_species,
-  host_common   = blood_raw$host_common,
-  host_method   = blood_raw$host_method,
-  BIOL3070_seqID = blood_raw$SEQ..BIOL3070
-)
-
-# Drop Cx_erythrothorax and Cx_tarsalis
-blood <- subset(blood, mosq_species != "Cx_erythrothorax")
-blood <- subset(blood, mosq_species != "Cx_tarsalis")
-
-head(blood)
-```
-
-## Pip - WNV test status by mosquito pool
-
-```{r pools-pip}
-pools_raw <- read.csv("./data/mosquito_pools_WNV.csv", stringsAsFactors = FALSE)
-
-pools <- data.frame(
-  agency_pool_num = pools_raw$agency_pool_num,
-  mosq_species    = pools_raw$mosq_species,
-  num_count       = pools_raw$num_count,
-  date            = as.Date(pools_raw$collection_date, 
-                            tryFormats = c("%Y-%m-%d","%m/%d/%Y")),
-  year            = pools_raw$year,
-  month           = pools_raw$month,
-  lat             = pools_raw$longitude,
-  long            = pools_raw$latitude,
-  loc_code        = pools_raw$site_code,
-  loc_name        = pools_raw$site_name,
-  loc_year_month = pools_raw$loc_year_month,
-  test_status     = pools_raw$test_status
-)
-
-# Drop Cx_erythrothorax and Cx_tarsalis
-blood <- subset(blood, mosq_species != "Cx_erythrothorax")
-blood <- subset(blood, mosq_species != "Cx_tarsalis")
-
-head(pools)
-```
-
-## Pip - Overlap by loc_year_month
-
-```{r overlap-pip}
-# Inner join by loc_year_month
-overlap <- merge(
-  blood,
-  pools,
-  by = c("loc_year_month")
-)
-
-head(overlap); str(overlap)
-
-write.csv(overlap, "overlap_bloodmeal_WNV_pip_only.csv", row.names = FALSE)
-
-
-nrow(overlap)
-```
-
-## Pip - Collapse to counts
-
-Host species, and counts of confirmed/negative WNV pools by
-loc_year_month.
-
-### Pip - Narrow format only one host_species column...
-
-```{r counts-pip}
-## 1) Bloodmeal counts: host species per key
-host_counts <- aggregate(
-  x = list(n_bloodmeals = rep(1, nrow(blood))),
-  by = list(
-    loc_year_month = blood$loc_year_month,
-    mosq_species   = blood$mosq_species,
-    host_common   = blood$host_common
-  ),
-  FUN = sum
-)
-
-## 2) WNV pool counts: test status per key
-pool_counts_long <- aggregate(
-  x = list(n_pools = rep(1, nrow(pools))),
-  by = list(
-    loc_year_month = pools$loc_year_month,
-    mosq_species   = pools$mosq_species,
-    test_status    = pools$test_status
-  ),
-  FUN = sum
-)
-
-## 3) Make Confirmed/Negative columns (keep both; fill missing with 0)
-pc_conf <- subset(pool_counts_long, test_status == "Confirmed")[, c("loc_year_month","mosq_species","n_pools")]
-names(pc_conf)[3] <- "pools_confirmed"
-
-pc_neg  <- subset(pool_counts_long, test_status == "Negative")[, c("loc_year_month","mosq_species","n_pools")]
-names(pc_neg)[3] <- "pools_negative"
-
-pool_counts_wide <- merge(pc_conf, pc_neg, by = c("loc_year_month","mosq_species"), all = TRUE)
-pool_counts_wide$pools_confirmed[is.na(pool_counts_wide$pools_confirmed)] <- 0
-pool_counts_wide$pools_negative[is.na(pool_counts_wide$pools_negative)]   <- 0
-
-## 4) Join: host × (confirmed/negative) per key; keep ALL host_species
-counts <- merge(
-  host_counts,
-  pool_counts_wide,
-  by = c("loc_year_month","mosq_species"),
-  all.x = TRUE
-)
-
-## replace NAs for pool counts with 0 (keys with blood meals but no pools)
-counts$pools_confirmed[is.na(counts$pools_confirmed)] <- 0
-counts$pools_negative[is.na(counts$pools_negative)]   <- 0
-
-## check
-head(counts)
-
-sum(counts$n_bloodmeals)  
-
-```
-
-### Pip - Wide format counts
-
-For CCA (or RDA, PERMANOVA, etc.) you want the host species as separate
-columns, one per species, with counts filled in (0 if absent). That way
-you have a site × time × mosquito species matrix of bird hosts.
-
-```{r count-wide-pip}
-## 1) Bloodmeal counts: wide by host species
-host_counts <- aggregate(
-  x = list(n_bloodmeals = rep(1, nrow(blood))),
-  by = list(
-    loc_year_month = blood$loc_year_month,
-    mosq_species   = blood$mosq_species,
-    host_common   = blood$host_common
-  ),
-  FUN = sum
-)
-
-## reshape wide: each host_species becomes its own column
-host_counts_wide <- reshape(
-  host_counts,
-  idvar   = c("loc_year_month","mosq_species"),
-  timevar = "host_common",
-  direction = "wide"
-)
-
-## clean names: host_species -> host_xxx
-names(host_counts_wide) <- sub("^n_bloodmeals\\.", "host_", names(host_counts_wide))
-
-## replace NAs with 0 (no samples of that host at that site/month/species)
-host_counts_wide[is.na(host_counts_wide)] <- 0
-
-## 2) Pool counts: confirmed/negative (same as before)
-pool_counts_long <- aggregate(
-  x = list(n_pools = rep(1, nrow(pools))),
-  by = list(
-    loc_year_month = pools$loc_year_month,
-    mosq_species   = pools$mosq_species,
-    test_status    = pools$test_status
-  ),
-  FUN = sum
-)
-
-pc_conf <- subset(pool_counts_long, test_status == "Confirmed")[, c("loc_year_month","mosq_species","n_pools")]
-names(pc_conf)[3] <- "pools_confirmed"
-
-pc_neg <- subset(pool_counts_long, test_status == "Negative")[, c("loc_year_month","mosq_species","n_pools")]
-names(pc_neg)[3] <- "pools_negative"
-
-pool_counts_wide <- merge(pc_conf, pc_neg, by = c("loc_year_month","mosq_species"), all = TRUE)
-pool_counts_wide$pools_confirmed[is.na(pool_counts_wide$pools_confirmed)] <- 0
-pool_counts_wide$pools_negative[is.na(pool_counts_wide$pools_negative)]   <- 0
-
-## 3) Final join: host × pools
-counts_matrix <- merge(
-  host_counts_wide,
-  pool_counts_wide,
-  by = c("loc_year_month","mosq_species"),
-  all = TRUE
-)
-
-## replace NAs with 0 after join
-counts_matrix[is.na(counts_matrix)] <- 0
-
-# Did I loose any host data?
-# Identify host columns (everything starting with "host_")
-host_cols <- grep("^host_", names(counts_matrix))
-
-# Sum all host counts across the matrix
-sum(counts_matrix[ , host_cols])
-
-# add a column for location specific positives:
-# Compute whether any positives occurred at each site×month
-loc_pos <- aggregate(
-  pools_confirmed ~ loc_year_month,
-  counts_matrix,
-  function(x) as.integer(sum(x) > 0)
-)
-names(loc_pos)[2] <- "loc_positives"
-
-# Join back into your main matrix
-counts_matrix <- merge(counts_matrix, loc_pos, by = "loc_year_month", all.x = TRUE)
-
-# Quick check
-table(counts_matrix$loc_positives)  # 0 = no positives that month; 1 = at least one positive
-
-## Save
-out_file <- "overlap_bloodmeal_WNV_counts_pip_only.csv"
-write.csv(counts_matrix, out_file, row.names = FALSE)
-```
-
-## Pip - Stacked barplot of host composition by loc_positives (0 vs 1)
-
-```{r barplot-pip,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
-## 1) Identify host columns
-host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
-
-## 2) Aggregate host counts by loc_positives (0/1)
-agg <- aggregate(counts_matrix[, host_cols, drop = FALSE],
-                 by = list(loc_positives = counts_matrix$loc_positives),
-                 FUN = sum)
-
-## ensure order is 0,1 if both exist
-agg <- agg[order(agg$loc_positives), , drop = FALSE]
-
-## 3) Order host columns by overall abundance for a nicer legend
-totals <- colSums(agg[, host_cols, drop = FALSE])
-host_order <- names(sort(totals, decreasing = TRUE))
-
-## 4) Build matrices for plotting
-mat_counts <- t(as.matrix(agg[, host_order, drop = FALSE]))  # rows=hosts, cols=loc_positives groups
-colnames(mat_counts) <- paste0("loc_positives=", agg$loc_positives)
-
-## 5) Colors and labels
-n_hosts <- nrow(mat_counts)
-cols <- rainbow(n_hosts+10)
-leg_labs <- sub("^host_", "", rownames(mat_counts))  # cleaner legend labels
-
-mat_counts
-
-## 6a) Stacked barplot — COUNTS
-op <- par(mar = c(5, 4, 2, 20))  # extra right margin for legend
-barplot(mat_counts, beside = FALSE, col = cols,
-        names.arg = c("0",">1"),
-        ylab = "Bloodmeal counts",
-        xlab = "Any WNV+ pools at site×month?")
-legend("topright", inset = c(-0.78, 0), xpd = TRUE,
-       legend = leg_labs, fill = cols, cex = 0.7)
-par(op)
-
-## 6b) (Optional) Stacked barplot — PROPORTIONS
-mat_props <- apply(mat_counts, 2, function(x) if (sum(x) > 0) x / sum(x) else x)
-op <- par(mar = c(5, 4, 2, 20))
-barplot(mat_props, beside = FALSE, col = cols,
-        names.arg = c("0",">1"),
-        ylab = "Proportion of bloodmeals",
-        xlab = "Any WNV+ pools at site×month?")
-legend("topright", inset = c(-0.78, 0), xpd = TRUE,
-       legend = leg_labs, fill = cols, cex = 0.7)
-par(op)
-```
-
-## Pip - Fisher's Exact Tests
-
-### Pip - House finch over-represented in locations with \>1 positive pool?
-
-```{r finch-pip}
-# Build 2x2 for House Finch
-hf_table <- matrix(c(
-  17,  # Finch in loc_positive=1
-  78,  # Finch in loc_positive=0
-  sum(counts_matrix$loc_positives) - 17,  # All other hosts in positive
-  sum(1 - counts_matrix$loc_positives) - 78  # All other hosts in negative
-), nrow = 2, byrow = TRUE)
-
-fisher.test(hf_table)
-```
-
-### Pip - Song sparrow over-represented in locations with \>1 positive pool?
-
-(I just happened to notice from the bar plot that it looks to be)...
-
-```{r song-pip}
-# Build 2x2 for Song Sparrow
-ss_table <- matrix(c(
-  4,  # Sparrow in loc_positive=1
-  2,  # Sparrow in loc_positive=0
-  sum(counts_matrix$loc_positives) - 4,
-  sum(1 - counts_matrix$loc_positives) - 2
-), nrow = 2, byrow = TRUE)
-
-fisher.test(ss_table)
-```
-
-## Pip - GLM Song Sparrow
-
-Does song sparrow have an effect in pip only data? Maybe?
-
-```{r}
-#glm with bird
-glm1 <- glm(loc_positives ~ host_Song_sparrow,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
-```
-
-## Pip - GLM house finch
-
-Does house finch have an effect in pip only data? NO.
-
-```{r}
-#glm with bird
-glm1 <- glm(loc_positives ~ host_House_finch,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
-
-```
-
-# ALL DATA
-
 All data available, pip and tars Uniting WNV and Bloodmeal COi Sequences
 
-## PipTar - Bloodmeal COi Sequences
+# Bloodmeal COi Sequences
 
 ```{r blood}
 blood_raw <- read.csv("./data/bloodmeal_for_BIOL3070.csv", stringsAsFactors = FALSE)
@@ -370,7 +27,7 @@ blood <- data.frame(
   long           = blood_raw$Long,
   loc_name       = blood_raw$Location,
   loc_code       = blood_raw$site_code,
-  loc_year_month = blood_raw$loc_year_month,
+  loc_year = sub("\\..*$", "", blood_raw$loc_year_month),
   mosq_species   = blood_raw$mosq_species,
   host_species   = blood_raw$host_species,
   host_common   = blood_raw$host_common,
@@ -384,7 +41,7 @@ blood <- subset(blood, mosq_species != "Cx_erythrothorax")
 head(blood)
 ```
 
-## PipTar - WNV test status by mosquito pool
+# WNV test status by mosquito pool
 
 ```{r pools}
 pools_raw <- read.csv("./data/mosquito_pools_WNV.csv", stringsAsFactors = FALSE)
@@ -401,7 +58,7 @@ pools <- data.frame(
   long            = pools_raw$latitude,
   loc_code        = pools_raw$site_code,
   loc_name        = pools_raw$site_name,
-  loc_year_month = pools_raw$loc_year_month,
+  loc_year = sub("\\..*$", "", pools_raw$loc_year_month),
   test_status     = pools_raw$test_status
 )
 
@@ -411,37 +68,68 @@ pools <- subset(pools, mosq_species != "Cx_erythrothorax")
 head(pools)
 ```
 
-## PipTar - Overlap by loc_year_month + mosq_species
+# Overlap by loc_year + mosq_species
 
 ```{r}
-# Inner join by loc_year_month + mosq_species
+# Inner join by loc_year + mosq_species
 overlap <- merge(
   blood,
   pools,
-  by = c("loc_year_month", "mosq_species")
+  by = c("loc_year", "mosq_species")
 )
 
-head(overlap); str(overlap)
-
-write.csv(overlap, "overlap_bloodmeal_WNV_pip_tar.csv", row.names = FALSE)
-
-
-nrow(overlap)
+head(overlap); str(overlap); nrow(overlap)
 ```
 
-## PipTar - Collapse to counts
+## Taxonomy
+
+```{r}
+# Add taxonomy to table
+library(taxize)
+overlap$species <- gsub("_", " ", overlap$host_species)
+species_names <- unique(overlap$species)
+
+get_tax <- function(sp) {
+  x <- try(classification(sp, db = "gbif")[[1]], silent = TRUE)
+  if (inherits(x, "try-error") || is.null(x)) return(NULL)
+  x$rank <- tolower(x$rank)
+  pick <- function(rk) {
+    v <- x$name[x$rank == rk]
+    if (length(v) > 0) v[1] else NA
+  }
+  data.frame(
+    species = sp,
+    genus   = pick("genus"),
+    family  = pick("family"),
+    order   = pick("order"),
+    class   = pick("class"),
+    stringsAsFactors = FALSE
+  )
+}
+
+tax_table <- do.call(rbind, lapply(species_names, get_tax))
+
+# join back to overlap
+overlap <- merge(overlap, tax_table, by = "species", all.x = TRUE)
+head(overlap[c("host_species","species","genus","family","order","class")])
+
+# Write to file
+write.csv(overlap, "./data/overlap_bloodmeal_WNV_byYear_pip_tar.csv", row.names = FALSE)
+```
+
+# Collapse to counts
 
 Host species, and counts of confirmed/negative WNV pools by
-loc_year_month × mosq_species.
+loc_year × mosq_species.
 
-### PipTar - Narrow format only one host_species column...
+## Narrow format only one host_species column...
 
 ```{r counts}
 ## 1) Bloodmeal counts: host species per key
 host_counts <- aggregate(
   x = list(n_bloodmeals = rep(1, nrow(blood))),
   by = list(
-    loc_year_month = blood$loc_year_month,
+    loc_year = blood$loc_year,
     mosq_species   = blood$mosq_species,
     host_common   = blood$host_common
   ),
@@ -452,7 +140,7 @@ host_counts <- aggregate(
 pool_counts_long <- aggregate(
   x = list(n_pools = rep(1, nrow(pools))),
   by = list(
-    loc_year_month = pools$loc_year_month,
+    loc_year = pools$loc_year,
     mosq_species   = pools$mosq_species,
     test_status    = pools$test_status
   ),
@@ -460,13 +148,13 @@ pool_counts_long <- aggregate(
 )
 
 ## 3) Make Confirmed/Negative columns (keep both; fill missing with 0)
-pc_conf <- subset(pool_counts_long, test_status == "Confirmed")[, c("loc_year_month","mosq_species","n_pools")]
+pc_conf <- subset(pool_counts_long, test_status == "Confirmed")[, c("loc_year","mosq_species","n_pools")]
 names(pc_conf)[3] <- "pools_confirmed"
 
-pc_neg  <- subset(pool_counts_long, test_status == "Negative")[, c("loc_year_month","mosq_species","n_pools")]
+pc_neg  <- subset(pool_counts_long, test_status == "Negative")[, c("loc_year","mosq_species","n_pools")]
 names(pc_neg)[3] <- "pools_negative"
 
-pool_counts_wide <- merge(pc_conf, pc_neg, by = c("loc_year_month","mosq_species"), all = TRUE)
+pool_counts_wide <- merge(pc_conf, pc_neg, by = c("loc_year","mosq_species"), all = TRUE)
 pool_counts_wide$pools_confirmed[is.na(pool_counts_wide$pools_confirmed)] <- 0
 pool_counts_wide$pools_negative[is.na(pool_counts_wide$pools_negative)]   <- 0
 
@@ -474,7 +162,7 @@ pool_counts_wide$pools_negative[is.na(pool_counts_wide$pools_negative)]   <- 0
 counts <- merge(
   host_counts,
   pool_counts_wide,
-  by = c("loc_year_month","mosq_species"),
+  by = c("loc_year","mosq_species"),
   all.x = TRUE
 )
 
@@ -489,7 +177,7 @@ sum(counts$n_bloodmeals)
 
 ```
 
-### PipTar - Wide format counts
+## Wide format counts
 
 For CCA (or RDA, PERMANOVA, etc.) you want the host species as separate
 columns, one per species, with counts filled in (0 if absent). That way
@@ -500,7 +188,7 @@ you have a site × time × mosquito species matrix of bird hosts.
 host_counts <- aggregate(
   x = list(n_bloodmeals = rep(1, nrow(blood))),
   by = list(
-    loc_year_month = blood$loc_year_month,
+    loc_year = blood$loc_year,
     mosq_species   = blood$mosq_species,
     host_common   = blood$host_common
   ),
@@ -510,7 +198,7 @@ host_counts <- aggregate(
 ## reshape wide: each host_species becomes its own column
 host_counts_wide <- reshape(
   host_counts,
-  idvar   = c("loc_year_month","mosq_species"),
+  idvar   = c("loc_year","mosq_species"),
   timevar = "host_common",
   direction = "wide"
 )
@@ -525,20 +213,20 @@ host_counts_wide[is.na(host_counts_wide)] <- 0
 pool_counts_long <- aggregate(
   x = list(n_pools = rep(1, nrow(pools))),
   by = list(
-    loc_year_month = pools$loc_year_month,
+    loc_year = pools$loc_year,
     mosq_species   = pools$mosq_species,
     test_status    = pools$test_status
   ),
   FUN = sum
 )
 
-pc_conf <- subset(pool_counts_long, test_status == "Confirmed")[, c("loc_year_month","mosq_species","n_pools")]
+pc_conf <- subset(pool_counts_long, test_status == "Confirmed")[, c("loc_year","mosq_species","n_pools")]
 names(pc_conf)[3] <- "pools_confirmed"
 
-pc_neg <- subset(pool_counts_long, test_status == "Negative")[, c("loc_year_month","mosq_species","n_pools")]
+pc_neg <- subset(pool_counts_long, test_status == "Negative")[, c("loc_year","mosq_species","n_pools")]
 names(pc_neg)[3] <- "pools_negative"
 
-pool_counts_wide <- merge(pc_conf, pc_neg, by = c("loc_year_month","mosq_species"), all = TRUE)
+pool_counts_wide <- merge(pc_conf, pc_neg, by = c("loc_year","mosq_species"), all = TRUE)
 pool_counts_wide$pools_confirmed[is.na(pool_counts_wide$pools_confirmed)] <- 0
 pool_counts_wide$pools_negative[is.na(pool_counts_wide$pools_negative)]   <- 0
 
@@ -546,7 +234,7 @@ pool_counts_wide$pools_negative[is.na(pool_counts_wide$pools_negative)]   <- 0
 counts_matrix <- merge(
   host_counts_wide,
   pool_counts_wide,
-  by = c("loc_year_month","mosq_species"),
+  by = c("loc_year","mosq_species"),
   all = TRUE
 )
 
@@ -561,28 +249,123 @@ host_cols <- grep("^host_", names(counts_matrix))
 sum(counts_matrix[ , host_cols])
 
 # add a column for location specific positives:
-# Compute whether any positives occurred at each site×month
+# Compute whether any positives occurred at each site×year
 loc_pos <- aggregate(
-  pools_confirmed ~ loc_year_month,
+  pools_confirmed ~ loc_year,
   counts_matrix,
   function(x) as.integer(sum(x) > 0)
 )
 names(loc_pos)[2] <- "loc_positives"
 
 # Join back into your main matrix
-counts_matrix <- merge(counts_matrix, loc_pos, by = "loc_year_month", all.x = TRUE)
+counts_matrix <- merge(counts_matrix, loc_pos, by = "loc_year", all.x = TRUE)
 
 # Quick check
-table(counts_matrix$loc_positives)  # 0 = no positives that month; 1 = at least one positive
+table(counts_matrix$loc_positives)  # 0 = no positives that year; 1 = at least one positive
 
 ## Save
-out_file <- "overlap_bloodmeal_WNV_counts_pip_tar.csv"
+out_file <- "./data/overlap_bloodmeal_WNV_counts_byYear_pip_tar.csv"
 write.csv(counts_matrix, out_file, row.names = FALSE)
 ```
 
-## PipTar - Stacked barplot of host composition by loc_positives (0 vs 1)
+# Barplots
 
-```{r, ,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
+## Horizontal plots
+```{r horiz-plot,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
+## --- 0) Inputs assumed ---
+## counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
+
+## 1) Identify host columns
+host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
+
+if (length(host_cols) == 0) {
+  stop("No columns matching '^host_' were found in counts_matrix.")
+}
+
+## 2) Ensure loc_positives is present and has both levels 0 and 1 where possible
+counts_matrix$loc_positives <- factor(counts_matrix$loc_positives, levels = c(0, 1))
+
+## 3) Aggregate host counts by loc_positives
+agg <- stats::aggregate(
+  counts_matrix[, host_cols, drop = FALSE],
+  by = list(loc_positives = counts_matrix$loc_positives),
+  FUN = function(x) sum(as.numeric(x), na.rm = TRUE)
+)
+
+## make sure both rows exist; if one is missing, add a zero row
+need_levels <- setdiff(levels(counts_matrix$loc_positives), as.character(agg$loc_positives))
+if (length(need_levels)) {
+  zero_row <- as.list(rep(0, length(host_cols)))
+  names(zero_row) <- host_cols
+  for (lv in need_levels) {
+    agg <- rbind(agg, c(lv, zero_row))
+  }
+  ## restore proper type
+  agg$loc_positives <- factor(agg$loc_positives, levels = c("0","1"))
+  ## coerce numeric host cols (they may have become character after rbind)
+  for (hc in host_cols) agg[[hc]] <- as.numeric(agg[[hc]])
+  agg <- agg[order(agg$loc_positives), , drop = FALSE]
+}
+
+## 4) Decide species order (overall abundance, descending)
+overall <- colSums(agg[, host_cols, drop = FALSE], na.rm = TRUE)
+host_order <- names(sort(overall, decreasing = TRUE))
+species_labels <- rev(sub("^host_", "", host_order))  # nicer labels
+
+## 5) Build count vectors for each panel in the SAME order
+counts0 <- rev(as.numeric(agg[agg$loc_positives == 0, host_order, drop = TRUE]))
+counts1 <- rev(as.numeric(agg[agg$loc_positives == 1, host_order, drop = TRUE]))
+
+## 6) Colors: reuse your existing 'cols' if it exists and is long enough; otherwise generate
+if (exists("cols") && length(cols) >= length(host_order)) {
+  species_colors <- setNames(cols[seq_along(host_order)], species_labels)
+} else {
+  species_colors <- setNames(rainbow(length(host_order) + 10)[seq_along(host_order)], species_labels)
+}
+
+## 7) Shared x-limit for comparability
+xmax <- max(c(counts0, counts1), na.rm = TRUE)
+xmax <- if (is.finite(xmax)) xmax else 1
+xlim_use <- c(0, xmax * 1.08)
+
+## 8) Plot: two horizontal barplots with identical order and colors
+op <- par(mfrow = c(1, 2),
+          mar = c(4, 12, 3, 2),  # big left margin for species names
+          xaxs = "i")           # a bit tighter axis padding
+
+## Panel A: No WNV detected (loc_positives = 0)
+barplot(height = counts0,
+        names.arg = species_labels, 
+        cex.names = .5,
+        cex.axis = .5,
+        col = rev(unname(species_colors[species_labels])),
+        horiz = TRUE,
+        las = 1,
+        xlab = "Bloodmeal counts",
+        main = "No WNV",
+        xlim = xlim_use)
+
+## Panel B: WNV detected (loc_positives = 1)
+barplot(height = counts1,
+        names.arg = species_labels, 
+        cex.names = .5,
+        cex.axis = .5,
+        col = rev(unname(species_colors[species_labels])),
+        horiz = TRUE,
+        las = 1,
+        xlab = "Bloodmeal counts",
+        main = "WNV detected",
+        xlim = xlim_use)
+
+par(op)
+
+## (Optional) Keep the mapping for reuse elsewhere
+host_species_colors <- species_colors
+```
+## Stacked plot
+Stacked barplot of host composition by loc_positives (0 vs 1)
+
+```{r stacked-plot,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
 ## 1) Identify host columns
 host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
 
@@ -614,7 +397,7 @@ op <- par(mar = c(5, 4, 2, 20))  # extra right margin for legend
 barplot(mat_counts, beside = FALSE, col = cols,
         names.arg = c("0",">1"),
         ylab = "Bloodmeal counts",
-        xlab = "Any WNV+ pools at site×month?")
+        xlab = "Any WNV+ pools at site×year?")
 legend("topright", inset = c(-0.78, 0), xpd = TRUE,
        legend = leg_labs, fill = cols, cex = 0.7)
 par(op)
@@ -625,126 +408,17 @@ op <- par(mar = c(5, 4, 2, 20))
 barplot(mat_props, beside = FALSE, col = cols,
         names.arg = c("0",">1"),
         ylab = "Proportion of bloodmeals",
-        xlab = "Any WNV+ pools at site×month?")
+        xlab = "Any WNV+ pools at site×year?")
 legend("topright", inset = c(-0.78, 0), xpd = TRUE,
        legend = leg_labs, fill = cols, cex = 0.7)
 par(op)
 ```
 
-## PipTar - Fisher's Exact Tests
+# GLM: Generalized Linear Modeling
 
-### PipTar - House finch over-represented in locations with \>1 positive pool?
+## House finch GLM
 
-```{r finch}
-# Build 2x2 for House Finch
-hf_table <- matrix(c(
-  17,  # Finch in loc_positive=1
-  80,  # Finch in loc_positive=0
-  sum(counts_matrix$loc_positives) - 17,  # All other hosts in positive
-  sum(1 - counts_matrix$loc_positives) - 80  # All other hosts in negative
-), nrow = 2, byrow = TRUE)
-
-fisher.test(hf_table)
-```
-
-### PipTar - Song sparrow over-represented in locations with \>1 positive pool?
-
-(I just happened to notice from the bar plot that it looks to be)...
-
-```{r song}
-# Build 2x2 for Song Sparrow
-ss_table <- matrix(c(
-  4,  # Sparrow in loc_positive=1
-  2,  # Sparrow in loc_positive=0
-  sum(counts_matrix$loc_positives) - 4,
-  sum(1 - counts_matrix$loc_positives) - 2
-), nrow = 2, byrow = TRUE)
-
-fisher.test(ss_table)
-```
-
-### PipTar - Maybe its the mosquito? YES
-
-If Song Sparrows show up mostly where Cx. tarsalis is sampled, then the
-apparent “overrepresentation” could really be a mosquito-species effect
-rather than a host effect... but see below in Cx_pipiens_sl only
-dataset... the numbers are the same, and the Song Sparrow is even more
-significant by Fisher's Exact test, so my logic is flawed. Yet, the
-mosquito really does seem to play a big role! Does SLCMAD know that?
-
-```{r}
-# contingency table: mosquito species × loc_positives
-tab_ms <- table(counts_matrix$mosq_species, counts_matrix$loc_positives)
-tab_ms
-
-# Fisher’s exact test
-fisher.test(tab_ms)
-```
-
-The p-value (0.0025) is significant → the distribution of positives
-differs between Cx. pipiens sl and Cx. tarsalis. The odds ratio \< 1
-(0.65) means that Cx. tarsalis pools were less likely to be positive
-compared to Cx. pipiens sl.
-
-## GLM Mosquito (and Song Sparrow)
-
-Does song sparrow have an effect after accounting for mosquito species
-of the positive pool? MAYBE? Hard to say...No song sparrows in locations
-with Cx. tarsalis positive pools, so we cannot test this yet.
-
-```{r}
-#glm with bird
-glm1 <- glm(loc_positives ~ host_Song_sparrow,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
-
-#glm with both
-glm2 <- glm(loc_positives ~ host_Song_sparrow * mosq_species,
-            data = counts_matrix,
-            family = binomial)
-summary(glm2)
-
-#glm with mosquito only
-glm2 <- glm(loc_positives ~ mosq_species,
-            data = counts_matrix,
-            family = binomial)
-summary(glm2)
-```
-
-Nope...we don't have sample size, but this indicates mosq_species is the
-more important indicator here!
-
-GLM Mosquito species effect In all three models, the coefficient for
-mosq_speciesCx_tarsalis is negative (around –0.42), with p-values
-\~0.003. That means that, compared to the reference (Cx. pipiens sl),
-the odds of seeing a positive at a site×month when the pools are Cx.
-tarsalis are significantly lower. Converting the log-odds: exp(–0.42) ≈
-0.66. That’s a \~34% reduction in odds of positivity relative to
-pipiens. host_Song_sparrow effect
-
-GLM song sparrow effect The coefficient for host_Song_sparrow is
-positive (\~+1.03), which would mean more Song Sparrow bloodmeals →
-higher odds of positives. But the p-value is 0.17, so the estimate is
-not statistically significant given your data (and the low sample size
-for sparrows).
-
-GLM song sparrow x mosquito Interaction model In loc_positives \~
-host_Song_sparrow \* mosq_species, the interaction term is NA. That
-means there were no rows with enough variation to estimate “Song Sparrow
-effect within tarsalis.” In other words, Song Sparrows only co-occur
-with one mosquito species (probably pipiens), so the model can’t
-separate the two.
-
-Mosquito-only model Even without Song Sparrow in the model, mosq_species
-stays significant. So the signal is really being driven by differences
-between Cx. pipiens sl and Cx. tarsalis pools, not by Song Sparrow
-counts.
-
-## GLM Mosquito (and house finch)
-
-Does house finch have an effect after accounting for mosquito species of
-the positive pool? NO.
+Does house finch have an effect by location x year? YES.
 
 ```{r}
 #glm with bird
@@ -752,161 +426,28 @@ glm1 <- glm(loc_positives ~ host_House_finch,
             data = counts_matrix,
             family = binomial)
 summary(glm1)
-
-#glm with interactive effect
-glm2 <- glm(loc_positives ~ host_House_finch * mosq_species,
-            data = counts_matrix,
-            family = binomial)
-summary(glm2)
-
-#glm with mosquito only
-glm2 <- glm(loc_positives ~ mosq_species,
-            data = counts_matrix,
-            family = binomial)
-summary(glm2)
 ```
 
-### NOTE: I would explore host/mosquito species in pool a little more...
+## Song Sparrow GLM
 
-But... we can't without more Cx. tarsalis bloodmeal data, because...
-Every bloodmeal observation in overlap is being “tagged” with the
-species from the pools at that site × month.
-
-But the bloodmeal mosquito species may not actually be that species at
-all — we're borrowing the label from the pools.
-
-Since we only have 11-ish Cx. tarsalis in the bloodmeal data, the rest
-is Cx. pipiens sl., maybe we should focus on the part of each dataset
-that is Cx. pipiens for any host effect.
-
-TO improve sample size, maybe we should drop up a taxonomic level to
-family/order.\
-\
-
-| host_species | common_name | family | order |
-|----------------------|------------------|----------------|----------------|
-| host_Haemorhous_mexicanus | House Finch | Fringillidae | Passeriformes |
-| host_House_sparrow | House Sparrow | Passeridae | Passeriformes |
-| host_Turdus_migratorius | American Robin | Turdidae | Passeriformes |
-| host_Zenaida_macroura | Mourning Dove | Columbidae | Columbiformes |
-| host_Streptopelia_decaocto | Eurasian Collared-dove | Columbidae | Columbiformes |
-| host_Sturnus_vulgaris | Common Starling | Sturnidae | Passeriformes |
-| host_Accipiter_cooperii | Cooper’s Hawk | Accipitridae | Accipitriformes |
-| host_Cariama_cristata | Red-legged Seriema | Cariamidae | Cariamiformes |
-| host_Pica_hudsonia | Black-billed Magpie | Corvidae | Passeriformes |
-| host_Poecile_atricapillus | Black-capped Chickadee | Paridae | Passeriformes |
-| host_Homo_sapiens | Human | Hominidae | Primates |
-| host_Melospiza_melodia | Song Sparrow | Passerellidae | Passeriformes |
-| host_Gallus_gallus | Chicken | Phasianidae | Galliformes |
-| host_Bos_taurus | Cow | Bovidae | Artiodactyla |
-| host_Callipepla_californica | California Quail | Odontophoridae | Galliformes |
-| host_Icterus_bullockii | Bullock’s Oriole | Icteridae | Passeriformes |
-| host_Phoenicopterus_chilensis | Chilean Flamingo | Phoenicopteridae | Phoenicopteriformes |
-| host_Tyrannus_verticalis | Western Kingbird | Tyrannidae | Passeriformes |
-| host_Podiceps_nigricollis | Black-necked Grebe | Podicipedidae | Podicipediformes |
-| host_Petrochelidon_pyrrhonota | Cliff Swallow | Hirundinidae | Passeriformes |
-| host_Canis_familiaris | Dog | Canidae | Carnivora |
-| host_Dromaius_novaehollandiae | Emu | Dromaiidae | Casuariiformes |
-| host_Coturnix_coturnix | European Quail | Phasianidae | Galliformes |
-| host_Coturnix_japonica | Japanese Quail | Phasianidae | Galliformes |
-| host_Empidonax_sp | Flycatcher (sp.) | Tyrannidae | Passeriformes |
-| host_Catharus_guttatus | Hermit Thrush | Turdidae | Passeriformes |
-| host_Cistothorus_palustris | Marsh Wren | Troglodytidae | Passeriformes |
-| host_Antilocapra_americana | Pronghorn | Antilocapridae | Artiodactyla |
-| host_Columba_livia | Rock Dove / Feral Pigeon | Columbidae | Columbiformes |
-| host_Grus_canadensis | Sandhill Crane | Gruidae | Gruiformes |
-| host_Buteo_swainsoni | Swainson’s Hawk | Accipitridae | Accipitriformes |
-| host_Ramphastos_toco | Toco Toucan | Ramphastidae | Piciformes |
-| host_Sturnella_neglecta | Western Meadowlark | Icteridae | Passeriformes |
-| host_Piranga_ludoviciana | Western Tanager | Cardinalidae | Passeriformes |
-| host_Setophaga_petechia | Yellow Warbler | Parulidae | Passeriformes |
-
-```{r, include=FALSE,eval=FALSE}
-host_taxonomy <- data.frame(
-  host_species = c(
-    "host_Haemorhous_mexicanus",
-    "host_House_sparrow",
-    "host_Turdus_migratorius",
-    "host_Zenaida_macroura",
-    "host_Streptopelia_decaocto",
-    "host_Sturnus_vulgaris",
-    "host_Accipiter_cooperii",
-    "host_Cariama_cristata",
-    "host_Pica_hudsonia",
-    "host_Poecile_atricapillus",
-    "host_Homo_sapiens",
-    "host_Melospiza_melodia",
-    "host_Gallus_gallus",
-    "host_Bos_taurus",
-    "host_Callipepla_californica",
-    "host_Icterus_bullockii",
-    "host_Phoenicopterus_chilensis",
-    "host_Tyrannus_verticalis",
-    "host_Podiceps_nigricollis",
-    "host_Petrochelidon_pyrrhonota",
-    "host_Canis_familiaris",
-    "host_Dromaius_novaehollandiae",
-    "host_Coturnix_coturnix",
-    "host_Coturnix_japonica",
-    "host_Empidonax_sp",
-    "host_Catharus_guttatus",
-    "host_Cistothorus_palustris",
-    "host_Antilocapra_americana",
-    "host_Columba_livia",
-    "host_Grus_canadensis",
-    "host_Buteo_swainsoni",
-    "host_Ramphastos_toco",
-    "host_Sturnella_neglecta",
-    "host_Piranga_ludoviciana",
-    "host_Setophaga_petechia"
-  ),
-  common_name = c(
-    "House Finch","House Sparrow","American Robin","Mourning Dove",
-    "Eurasian Collared-dove","Common Starling","Cooper’s Hawk","Red-legged Seriema",
-    "Black-billed Magpie","Black-capped Chickadee","Human","Song Sparrow",
-    "Chicken","Cow","California Quail","Bullock’s Oriole","Chilean Flamingo",
-    "Western Kingbird","Black-necked Grebe","Cliff Swallow","Dog","Emu",
-    "European Quail","Japanese Quail","Flycatcher (sp.)","Hermit Thrush",
-    "Marsh Wren","Pronghorn","Rock Dove / Feral Pigeon","Sandhill Crane",
-    "Swainson’s Hawk","Toco Toucan","Western Meadowlark","Western Tanager",
-    "Yellow Warbler"
-  ),
-  family = c(
-    "Fringillidae","Passeridae","Turdidae","Columbidae","Columbidae","Sturnidae",
-    "Accipitridae","Cariamidae","Corvidae","Paridae","Hominidae","Passerellidae",
-    "Phasianidae","Bovidae","Odontophoridae","Icteridae","Phoenicopteridae",
-    "Tyrannidae","Podicipedidae","Hirundinidae","Canidae","Dromaiidae",
-    "Phasianidae","Phasianidae","Tyrannidae","Turdidae","Troglodytidae",
-    "Antilocapridae","Columbidae","Gruidae","Accipitridae","Ramphastidae",
-    "Icteridae","Cardinalidae","Parulidae"
-  ),
-  order = c(
-    "Passeriformes","Passeriformes","Passeriformes","Columbiformes","Columbiformes","Passeriformes",
-    "Accipitriformes","Cariamiformes","Passeriformes","Passeriformes","Primates","Passeriformes",
-    "Galliformes","Artiodactyla","Galliformes","Passeriformes","Phoenicopteriformes",
-    "Passeriformes","Podicipediformes","Passeriformes","Carnivora","Casuariiformes",
-    "Galliformes","Galliformes","Passeriformes","Passeriformes","Passeriformes",
-    "Artiodactyla","Columbiformes","Gruiformes","Accipitriformes","Piciformes",
-    "Passeriformes","Passeriformes","Passeriformes"
-  ),
-  stringsAsFactors = FALSE
-)
-
-# peek
-head(host_taxonomy)
-
-# join this with a long-format version of your counts:
-library(reshape2) # or tidyr::pivot_longer
-
-# melt counts_matrix to long
-counts_long <- melt(counts_matrix,
-                    id.vars = c("year_month_loc","loc_positives"),
-                    measure.vars = grep("^host_", names(counts_matrix), value = TRUE),
-                    variable.name = "host_species",
-                    value.name = "count")
-
-# add taxonomy info
-counts_annotated <- merge(counts_long, host_taxonomy, by = "host_species", all.x = TRUE)
-
-head(counts_annotated)
+Does song sparrow have an effect? Not enough sample size.
+```{r}
+#glm with bird
+glm1 <- glm(loc_positives ~ host_Song_sparrow,
+            data = counts_matrix,
+            family = binomial)
+summary(glm1)
 ```
+
+
+
+# NOTE: I would explore host/mosquito species in pool a little more...
+
+But... we can't without more Cx. tarsalis bloodmeal data, because... Every bloodmeal observation in overlap is being “tagged” with the species from the pools at that site × year.
+
+But the bloodmeal mosquito species may not actually be that species at all — we're borrowing the label from the pools.
+
+Since we only have 11-ish Cx. tarsalis in the bloodmeal data, the restis Cx. pipiens sl., maybe we should focus on the part of each datasetthat is Cx. pipiens for any host effect.
+
+TO improve sample size, maybe we should drop up a taxonomic level to family/order.
+
