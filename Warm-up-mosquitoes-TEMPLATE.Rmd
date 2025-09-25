@@ -1,6 +1,6 @@
 ---
 title: "Warm-up mini-Report: Mosquito Blood Hosts in \n Salt Lake City, Utah"
-author: "FILL IN YOUR NAME"
+author: "Norah Saarman"
 date: "`r Sys.Date()`"
 output:
   github_document:

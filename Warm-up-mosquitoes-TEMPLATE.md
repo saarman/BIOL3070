@@ -1,7 +1,7 @@
 Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
 ================
-FILL IN YOUR NAME
-2025-09-16
+Norah Saarman
+2025-09-23
 
 - [ABSTRACT](#abstract)
 - [BACKGROUND](#background)
@@ -132,4 +132,4 @@ project.
     Dis. 2003 Mar;9(3):311-22. <https://doi.org/10.3201/eid0903.020628>
 
 2.  ChatGPT. OpenAI, version Jan 2025. Used as a reference for functions
-    such as plot() and to correct syntax errors. Accessed 2025-09-16.
+    such as plot() and to correct syntax errors. Accessed 2025-09-23.

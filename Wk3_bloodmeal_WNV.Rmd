@@ -263,8 +263,17 @@ counts_matrix <- merge(counts_matrix, loc_pos, by = "loc_year", all.x = TRUE)
 # Quick check
 table(counts_matrix$loc_positives)  # 0 = no positives that year; 1 = at least one positive
 
+# Also estimate the location positivity rate
+counts_matrix$loc_rate <- counts_matrix$pools_confirmed/(counts_matrix$pools_confirmed + counts_matrix$pools_negative)
+
+#add back in lat/long
+
 ## Save
 out_file <- "./data/overlap_bloodmeal_WNV_counts_byYear_pip_tar.csv"
+write.csv(counts_matrix, out_file, row.names = FALSE)
+
+## Save final file for class analysis
+out_file <- "./bloodmeal_plusWNV_for_BIOL3070.csv"
 write.csv(counts_matrix, out_file, row.names = FALSE)
 ```
 
@@ -272,8 +281,8 @@ write.csv(counts_matrix, out_file, row.names = FALSE)
 
 ## Horizontal plots
 ```{r horiz-plot,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
-## --- 0) Inputs assumed ---
-## counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
+## import counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
+counts_matrix <- read.csv("./bloodmeal_plusWNV_for_BIOL3070.csv")
 
 ## 1) Identify host columns
 host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
@@ -342,7 +351,7 @@ barplot(height = counts0,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "No WNV",
+        main = "Locations WNV negative (-)",
         xlim = xlim_use)
 
 ## Panel B: WNV detected (loc_positives = 1)
@@ -354,100 +363,81 @@ barplot(height = counts1,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "WNV detected",
+        main = "Locations WNV positive (+)",
         xlim = xlim_use)
 
 par(op)
 
-## (Optional) Keep the mapping for reuse elsewhere
+## Keep the colors mapping for reuse elsewhere
 host_species_colors <- species_colors
-```
-## Stacked plot
-Stacked barplot of host composition by loc_positives (0 vs 1)
-
-```{r stacked-plot,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
-## 1) Identify host columns
-host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
-
-## 2) Aggregate host counts by loc_positives (0/1)
-agg <- aggregate(counts_matrix[, host_cols, drop = FALSE],
-                 by = list(loc_positives = counts_matrix$loc_positives),
-                 FUN = sum)
-
-## ensure order is 0,1 if both exist
-agg <- agg[order(agg$loc_positives), , drop = FALSE]
-
-## 3) Order host columns by overall abundance for a nicer legend
-totals <- colSums(agg[, host_cols, drop = FALSE])
-host_order <- names(sort(totals, decreasing = TRUE))
-
-## 4) Build matrices for plotting
-mat_counts <- t(as.matrix(agg[, host_order, drop = FALSE]))  # rows=hosts, cols=loc_positives groups
-colnames(mat_counts) <- paste0("loc_positives=", agg$loc_positives)
-
-## 5) Colors and labels
-n_hosts <- nrow(mat_counts)
-cols <- rainbow(n_hosts+10)
-leg_labs <- sub("^host_", "", rownames(mat_counts))  # cleaner legend labels
-
-mat_counts
-
-## 6a) Stacked barplot — COUNTS
-op <- par(mar = c(5, 4, 2, 20))  # extra right margin for legend
-barplot(mat_counts, beside = FALSE, col = cols,
-        names.arg = c("0",">1"),
-        ylab = "Bloodmeal counts",
-        xlab = "Any WNV+ pools at site×year?")
-legend("topright", inset = c(-0.78, 0), xpd = TRUE,
-       legend = leg_labs, fill = cols, cex = 0.7)
-par(op)
-
-## 6b) (Optional) Stacked barplot — PROPORTIONS
-mat_props <- apply(mat_counts, 2, function(x) if (sum(x) > 0) x / sum(x) else x)
-op <- par(mar = c(5, 4, 2, 20))
-barplot(mat_props, beside = FALSE, col = cols,
-        names.arg = c("0",">1"),
-        ylab = "Proportion of bloodmeals",
-        xlab = "Any WNV+ pools at site×year?")
-legend("topright", inset = c(-0.78, 0), xpd = TRUE,
-       legend = leg_labs, fill = cols, cex = 0.7)
-par(op)
 ```
 
 # GLM: Generalized Linear Modeling
 
 ## House finch GLM
 
-Does house finch have an effect by location x year? YES.
+Does house finch have an effect by location positive +/- (binary)? by location positivity rate? YES.
 
 ```{r}
-#glm with bird
+#glm with house finch alone against binary +/_
 glm1 <- glm(loc_positives ~ host_House_finch,
             data = counts_matrix,
             family = binomial)
 summary(glm1)
+
+#glm with house-finch alone against positivity rate
+glm2 <- glm(loc_rate ~ host_House_finch,
+            data = counts_matrix)
+summary(glm2)
 ```
 
 ## Song Sparrow GLM
 
 Does song sparrow have an effect? Not enough sample size.
 ```{r}
-#glm with bird
-glm1 <- glm(loc_positives ~ host_Song_sparrow,
+#glm with song sparrow alone against binary +/_
+glm3 <- glm(loc_positives ~ host_Song_sparrow,
             data = counts_matrix,
             family = binomial)
-summary(glm1)
+summary(glm3)
+
+#glm with song sparrow alone against positivity rate
+glm4 <- glm(loc_rate ~ host_Song_sparrow,
+            data = counts_matrix)
+summary(glm4)
 ```
 
 
 
 # NOTE: I would explore host/mosquito species in pool a little more...
 
-But... we can't without more Cx. tarsalis bloodmeal data, because... Every bloodmeal observation in overlap is being “tagged” with the species from the pools at that site × year.
+But... we can't without more Cx. tarsalis bloodmeal data, because... Every bloodmeal observation in overlap is being “tagged” with the species from the pools at that site × year. Without more data, we can't tell if the bloodmeal mosquito species may not actually be that species at all — we're borrowing the label from the pools.
 
-But the bloodmeal mosquito species may not actually be that species at all — we're borrowing the label from the pools.
+Since we only have 11-ish Cx. tarsalis in the bloodmeal data, the rest is Cx. pipiens sl., maybe we should focus on the part of each dataset that is Cx. pipiens for any host effect.
 
-Since we only have 11-ish Cx. tarsalis in the bloodmeal data, the restis Cx. pipiens sl., maybe we should focus on the part of each datasetthat is Cx. pipiens for any host effect.
+TO improve sample size, maybe we should drop up a taxonomic level of the host ID to family/order.
 
-TO improve sample size, maybe we should drop up a taxonomic level to family/order.
+
+# Heatmaps
+```{r}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+hm <- counts_matrix %>%
+  select(long, lat, loc_rate, host_House_finch) %>%
+  mutate(across(c(loc_rate, host_House_finch), ~ ifelse(is.na(.), 0, .))) %>%
+  pivot_longer(c(loc_rate, host_House_finch),
+               names_to = "metric", values_to = "value")
+
+ggplot(hm, aes(lon, lat, fill = value)) +
+  geom_tile(width = 0.01, height = 0.01) +
+  coord_equal() +
+  facet_wrap(~ metric, nrow = 1,
+             labeller = as_labeller(c(loc_rate = "WNV-positive pools (rate)",
+                                      host_House_finch = "House finch blood meals"))) +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  labs(fill = "Value", x = NULL, y = NULL)
+```
 
