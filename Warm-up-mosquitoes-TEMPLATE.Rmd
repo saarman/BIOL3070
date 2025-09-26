@@ -12,13 +12,13 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 # ABSTRACT
 
-Fill in abstract at the end after we have finished the methods, results, discussion, conclusions and know what our data "says".
+Fill in abstract... Write this last, after finishing methods, results, and discussion. Summarize the overall study question, approach, results, and conclusion in a short paragraph.
 
 # BACKGROUND
 
-Fill in some text here that provides background info on the WNV system, the blood meal DNA extractions, PCR, sequencing, etc. and the foundation for our question/hypothesis.
+Provide background on the WNV system and why we are studying mosquito blood meals. Include information on DNA extractions, PCR, sequencing, and how this relates to identifying hosts. Support your statements with references.
 
-For example, we can use the viremia duration (Kumar et al., 2003) bar plot (make sure to reference sources!!!)  to illustrate the potential importance of house finches in WNV transmission and as the logical foundation for our hypothesis that house finches serve as amplifying hosts for WNV... and the prediction that locations with more house finches in our blood host analysis are also the same locations with higher positive tests for WNV in mosquito pools... 
+Example: You might cite Komar et al. (2003) showing viremia duration in birds, which explains why house finches could act as amplifying hosts. Connect this to the prediction that locations with more house finch blood meals should also show higher rates of WNV-positive mosquito pools.
 
 NOTE: Examples of data you can plot for the background info at https://github.com/saarman/BIOL3070/
 
@@ -61,37 +61,201 @@ arrows(duration$lo, bp, duration$hi, bp,
 # STUDY QUESTION and HYPOTHESIS
 
 ## Questions  
-Fill in here, the question we want to answer... e.g. What bird species is acting as WNV amplifying host in Salt Lake City?
+Fill in here... state the main research question (e.g., Which bird species acts as an amplifying host of WNV in Salt Lake City?)
 
 ## Hypothesis 
-Fill in hypothesis... e.g. House finches are acting as important amplifying hosts of WNV in Salt Lake City.
+Fill in here... write your hypothesis clearly (e.g., House finches are acting as important amplifying hosts of WNV in Salt Lake City).
   
 ## Prediction
-Fill in prediction... e.g. If house finches are acting as important amplifying hosts, we predict that trapping locations where mosquitoes feed on house finches will also have higher rates of confirmed WNV in tested mosquito pools.
+Fill in here... Turn the hypothesis into a testable prediction (e.g., Locations with mosquito blood meals from house finches will also have higher numbers of WNV-positive mosquito pools).
 
 # MOTHODS
 
-Fill in here, including overview of procedure and methods used for this project.
+Fill in here... Summarize the procedures and analyses you use in this report. In this section, describe what you did and why. Don’t just restate the code — explain the logic of each analysis in plain language. Keep each subsection short (2–4 sentences).
 
-## Fill in first analysis
-```{r first-analysis, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left', fig.width=4.75, fig.height=7}
-# put code for analysis here
+## Fill in 1st analysis e.g. barplots
+
+Fill in here... Explain that you compared the number of mosquito blood meals from each host species between sites with no WNV-positive pools and sites with one or more WNV-positive pools. Describe why a barplot helps visualize this comparison.
+
+```{r first-analysis, warning=FALSE}
+## import counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
+counts_matrix <- read.csv("./bloodmeal_plusWNV_for_BIOL3070.csv")
+
+## 1) Identify host columns
+host_cols <- grep("^host_", names(counts_matrix), value = TRUE)
+
+if (length(host_cols) == 0) {
+  stop("No columns matching '^host_' were found in counts_matrix.")
+}
+
+## 2) Ensure loc_positives is present and has both levels 0 and 1 where possible
+counts_matrix$loc_positives <- factor(counts_matrix$loc_positives, levels = c(0, 1))
+
+## 3) Aggregate host counts by loc_positives
+agg <- stats::aggregate(
+  counts_matrix[, host_cols, drop = FALSE],
+  by = list(loc_positives = counts_matrix$loc_positives),
+  FUN = function(x) sum(as.numeric(x), na.rm = TRUE)
+)
+
+## make sure both rows exist; if one is missing, add a zero row
+need_levels <- setdiff(levels(counts_matrix$loc_positives), as.character(agg$loc_positives))
+if (length(need_levels)) {
+  zero_row <- as.list(rep(0, length(host_cols)))
+  names(zero_row) <- host_cols
+  for (lv in need_levels) {
+    agg <- rbind(agg, c(lv, zero_row))
+  }
+  ## restore proper type
+  agg$loc_positives <- factor(agg$loc_positives, levels = c("0","1"))
+  ## coerce numeric host cols (they may have become character after rbind)
+  for (hc in host_cols) agg[[hc]] <- as.numeric(agg[[hc]])
+  agg <- agg[order(agg$loc_positives), , drop = FALSE]
+}
+
+## 4) Decide species order (overall abundance, descending)
+overall <- colSums(agg[, host_cols, drop = FALSE], na.rm = TRUE)
+host_order <- names(sort(overall, decreasing = TRUE))
+species_labels <- rev(sub("^host_", "", host_order))  # nicer labels
+
+## 5) Build count vectors for each panel in the SAME order
+counts0 <- rev(as.numeric(agg[agg$loc_positives == 0, host_order, drop = TRUE]))
+counts1 <- rev(as.numeric(agg[agg$loc_positives == 1, host_order, drop = TRUE]))
+
+## 6) Colors: reuse your existing 'cols' if it exists and is long enough; otherwise generate
+if (exists("cols") && length(cols) >= length(host_order)) {
+  species_colors <- setNames(cols[seq_along(host_order)], species_labels)
+} else {
+  species_colors <- setNames(rainbow(length(host_order) + 10)[seq_along(host_order)], species_labels)
+}
+
+## 7) Shared x-limit for comparability
+xmax <- max(c(counts0, counts1), na.rm = TRUE)
+xmax <- if (is.finite(xmax)) xmax else 1
+xlim_use <- c(0, xmax * 1.08)
+
+## 8) Plot: two horizontal barplots with identical order and colors
+op <- par(mfrow = c(1, 2),
+          mar = c(4, 12, 3, 2),  # big left margin for species names
+          xaxs = "i")           # a bit tighter axis padding
+
+## Panel A: No WNV detected (loc_positives = 0)
+barplot(height = counts0,
+        names.arg = species_labels, 
+        cex.names = .5,
+        cex.axis = .5,
+        col = rev(unname(species_colors[species_labels])),
+        horiz = TRUE,
+        las = 1,
+        xlab = "Bloodmeal counts",
+        main = "Locations WNV (-)",
+        xlim = xlim_use)
+
+## Panel B: WNV detected (loc_positives = 1)
+barplot(height = counts1,
+        names.arg = species_labels, 
+        cex.names = .5,
+        cex.axis = .5,
+        col = rev(unname(species_colors[species_labels])),
+        horiz = TRUE,
+        las = 1,
+        xlab = "Bloodmeal counts",
+        main = "Locations WNV (+)",
+        xlim = xlim_use)
+
+par(op)
+
+## Keep the colors mapping for reuse elsewhere
+host_species_colors <- species_colors
+```
+## Fill in 2nd analysis/plot e.g. generalized linear model
+
+Fill in here... Explain that you tested whether the presence or number of house finch blood meals predicts whether a site had WNV-positive pools (binary) or a higher WNV positivity rate (numeric). Mention that this statistical test lets you formally evaluate the relationship suggested by the barplots.
+
+```{r}
+# second-analysis-or-plot, glm with house finch alone against binary +/_
+glm1 <- glm(loc_positives ~ host_House_finch,
+            data = counts_matrix,
+            family = binomial)
+summary(glm1)
+
+#glm with house-finch alone against positivity rate
+glm2 <- glm(loc_rate ~ host_House_finch,
+            data = counts_matrix)
+summary(glm2)
 ```
 
-## Fill in second analysis/plot
-```{r second-analysis-or-plot, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left', fig.width=4.75, fig.height=7}
-# put code for plotting here
+## Optional 3rd analysis/plot e.g. heatmap
+
+Fill in here... completely optional... If you include it, describe that you mapped mosquito blood meals and WNV-positive pools across space. Explain how this visualization can reveal whether the two overlap geographically, providing another way to evaluate your hypothesis.
+
+```{r third-analysis-or-plot, include=TRUE, eval=TRUE, warning=FALSE, fig.align='left'}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+hm <- counts_matrix %>%
+  filter(!is.na(long), !is.na(lat)) %>%
+  transmute(
+    long, lat,
+    `WNV-positive pools (rate)` = loc_rate,
+    `House finch blood meals`   = host_House_finch
+  ) %>%
+  pivot_longer(-c(long, lat), names_to = "metric", values_to = "value") %>%
+  mutate(value = ifelse(is.na(value), 0, value))
+
+# plot extent (a small pad around data)
+xpad <- diff(range(hm$long))*0.05
+ypad <- diff(range(hm$lat))*0.05
+xlim <- range(hm$long) + c(-xpad, xpad)
+ylim <- range(hm$lat) + c(-ypad, ypad)
+
+ggplot(hm, aes(long, lat)) +
+  borders("state", regions = "utah", colour = "grey75", fill = NA) +
+  # KDE hotspot, weighted by value
+  stat_density_2d_filled(
+    aes(weight = value, fill = after_stat(level)),
+    contour_var = "ndensity", geom = "polygon",
+    bins = 12, alpha = 0.9, adjust = 0.8
+  ) +
+  # optional faint contours
+  stat_density_2d(
+    aes(weight = value, color = after_stat(level)),
+    contour_var = "ndensity", bins = 12, linewidth = 0.15, show.legend = FALSE
+  ) +
+  # show sites lightly on top
+  geom_point(aes(size = pmax(value, 0.0001)), alpha = 0.5, shape = 21, stroke = 0.2,
+             fill = NA, color = "grey30", show.legend = FALSE) +
+  coord_quickmap(xlim = xlim, ylim = ylim) +
+  facet_wrap(~ metric, nrow = 1) +
+  scale_fill_viridis_d(option = "C", direction = -1, name = "Hotspot") +
+  guides(color = "none") +
+  theme_minimal() +
+  labs(x = NULL, y = NULL)
 ```
 
 # DISCUSSION
 
-## Interpretation - fill in analysis
+Fill in here... For each analysis, summarize what you found and interpret the results. Say whether they support or contradict your hypothesis.
 
-## Interpretation - fill in analysis/plot
+## Interpretation of 1st analysis (e.g. barplots)
+
+The first analysis... fill in here what it was, the summary of the results, and your interpretation. 
+
+## Interpretation of 2nd analysis (e.g. generalized linear model)
+
+The second analysis... fill in here what it was, the summary of the results, and your interpretation.
+
+## Optional interpretation of 3rd analysis (e.g. heatmaps)
+
+The third analysis... fill in here what it was, the summary of the results, and your interpretation.
 
 # CONCLUSION
 
+Fill in here... State the overall answer to your research question, based on all analyses. Mention whether the evidence supports your hypothesis and what it suggests about WNV amplification in Salt Lake City.
+
 # REFERENCES     
+Fill in here... List all sources you cited in your background and throughout the report. Use a consistent style.a conclusion you can draw from your analysis.
 
 1. Komar N, Langevin S, Hinten S, Nemeth N, Edwards E, Hettler D, Davis B, Bowen R, Bunning M. Experimental infection of North American birds with the New York 1999 strain of West Nile virus. Emerg Infect Dis. 2003 Mar;9(3):311-22. https://doi.org/10.3201/eid0903.020628
 
