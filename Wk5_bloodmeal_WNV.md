@@ -6,9 +6,9 @@ Sep 25, 2025
 - [Barplots of blood meal ID by trap locations with/without WNV positive
   mosquito
   pools](#barplots-of-blood-meal-id-by-trap-locations-withwithout-wnv-positive-mosquito-pools)
-- [Map of hotspots of house finches and WNV positive
-  pools](#map-of-hotspots-of-house-finches-and-wnv-positive-pools)
-- [GLM: Generalized Linear Modeling](#glm-generalized-linear-modeling)
+- [Generalized Linear Modeling (GLM)](#generalized-linear-modeling-glm)
+- [OPTIONAL: Map of hotspots of house finches and WNV positive
+  pools](#optional-map-of-hotspots-of-house-finches-and-wnv-positive-pools)
 
 # Barplots of blood meal ID by trap locations with/without WNV positive mosquito pools
 
@@ -85,7 +85,7 @@ barplot(height = counts0,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (-)",
+        main = "Sites WNV (-)",
         xlim = xlim_use)
 
 ## Panel B: WNV detected (loc_positives = 1)
@@ -97,11 +97,11 @@ barplot(height = counts1,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (+)",
+        main = "Sites WNV (+)",
         xlim = xlim_use)
 ```
 
-<img src="Wk5_bloodmeal_WNV_files/figure-gfm/horiz-plot-1.png" style="display: block; margin: auto auto auto 0;" />
+![](Wk5_bloodmeal_WNV_files/figure-gfm/first-analysis-1.png)<!-- -->
 
 ``` r
 par(op)
@@ -110,9 +110,45 @@ par(op)
 host_species_colors <- species_colors
 ```
 
-# Map of hotspots of house finches and WNV positive pools
+# Generalized Linear Modeling (GLM)
 
-Salt Lake City Mosquito Abatement Surveillance:
+House finch GLM:
+
+Is occurrence of house finch in blood meals associated with locations
+WNV positivity rate in tested mosquito pools?
+
+``` r
+#glm: house-finch correlated with WNV positivity rate of pools?
+glm2 <- glm(loc_rate ~ host_House_finch,
+            data = counts_matrix)
+summary(glm2)
+```
+
+    ## 
+    ## Call:
+    ## glm(formula = loc_rate ~ host_House_finch, data = counts_matrix)
+    ## 
+    ## Coefficients:
+    ##                  Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)      0.054861   0.006755   8.122 6.07e-15 ***
+    ## host_House_finch 0.027479   0.006662   4.125 4.54e-05 ***
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## (Dispersion parameter for gaussian family taken to be 0.01689032)
+    ## 
+    ##     Null deviance: 6.8915  on 392  degrees of freedom
+    ## Residual deviance: 6.6041  on 391  degrees of freedom
+    ##   (2 observations deleted due to missingness)
+    ## AIC: -484.56
+    ## 
+    ## Number of Fisher Scoring iterations: 2
+
+Answer: YES. Statistically significant association.
+
+Possible caveats? Limitations?
+
+# OPTIONAL: Map of hotspots of house finches and WNV positive pools
 
 ``` r
 library(dplyr)
@@ -174,69 +210,3 @@ ggplot(hm, aes(long, lat)) +
 ```
 
 ![](Wk5_bloodmeal_WNV_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
-
-# GLM: Generalized Linear Modeling
-
-House finch GLM:
-
-Does house finch have an effect by location positive +/- (binary)? by
-location positivity rate?
-
-``` r
-#glm with house finch alone against binary +/_
-glm1 <- glm(loc_positives ~ host_House_finch,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
-```
-
-    ## 
-    ## Call:
-    ## glm(formula = loc_positives ~ host_House_finch, family = binomial, 
-    ##     data = counts_matrix)
-    ## 
-    ## Coefficients:
-    ##                  Estimate Std. Error z value Pr(>|z|)  
-    ## (Intercept)       -0.1709     0.1053  -1.622   0.1047  
-    ## host_House_finch   0.3468     0.1586   2.187   0.0287 *
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## (Dispersion parameter for binomial family taken to be 1)
-    ## 
-    ##     Null deviance: 546.67  on 394  degrees of freedom
-    ## Residual deviance: 539.69  on 393  degrees of freedom
-    ## AIC: 543.69
-    ## 
-    ## Number of Fisher Scoring iterations: 4
-
-``` r
-#glm with house-finch alone against positivity rate
-glm2 <- glm(loc_rate ~ host_House_finch,
-            data = counts_matrix)
-summary(glm2)
-```
-
-    ## 
-    ## Call:
-    ## glm(formula = loc_rate ~ host_House_finch, data = counts_matrix)
-    ## 
-    ## Coefficients:
-    ##                  Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)      0.054861   0.006755   8.122 6.07e-15 ***
-    ## host_House_finch 0.027479   0.006662   4.125 4.54e-05 ***
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## (Dispersion parameter for gaussian family taken to be 0.01689032)
-    ## 
-    ##     Null deviance: 6.8915  on 392  degrees of freedom
-    ## Residual deviance: 6.6041  on 391  degrees of freedom
-    ##   (2 observations deleted due to missingness)
-    ## AIC: -484.56
-    ## 
-    ## Number of Fisher Scoring iterations: 2
-
-Answer: YES. Statistically significant association.
-
-Possible caveats? Limitations?

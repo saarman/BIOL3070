@@ -1,4 +1,5 @@
-Warm-up mini-Report: Mosquito Blood Hosts in Salt Lake City, Utah
+Warm-up mini-Report (Updated): Mosquito Blood Hosts in Salt Lake City,
+Utah
 ================
 Norah Saarman
 2025-09-30
@@ -189,7 +190,7 @@ barplot(height = counts0,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (-)",
+        main = "Sites WNV (-)",
         xlim = xlim_use)
 
 ## Panel B: WNV detected (loc_positives = 1)
@@ -201,7 +202,7 @@ barplot(height = counts1,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (+)",
+        main = "Sites WNV (+)",
         xlim = xlim_use)
 ```
 
@@ -217,41 +218,13 @@ host_species_colors <- species_colors
 ## Fill in 2nd analysis/plot e.g. generalized linear model
 
 Fill in here… Explain that you tested whether the presence or number of
-house finch blood meals predicts whether a site had WNV-positive pools
-(binary) or a higher WNV positivity rate (numeric). Mention that this
-statistical test lets you formally evaluate the relationship suggested
-by the barplots.
+house finch blood meals predicts whether a site had higher WNV
+positivity rate in tested mosquito pools. Mention that this statistical
+test lets you formally evaluate the relationship suggested by the
+barplots.
 
 ``` r
-# second-analysis-or-plot, glm with house finch alone against binary +/_
-glm1 <- glm(loc_positives ~ host_House_finch,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
-```
-
-    ## 
-    ## Call:
-    ## glm(formula = loc_positives ~ host_House_finch, family = binomial, 
-    ##     data = counts_matrix)
-    ## 
-    ## Coefficients:
-    ##                  Estimate Std. Error z value Pr(>|z|)  
-    ## (Intercept)       -0.1709     0.1053  -1.622   0.1047  
-    ## host_House_finch   0.3468     0.1586   2.187   0.0287 *
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## (Dispersion parameter for binomial family taken to be 1)
-    ## 
-    ##     Null deviance: 546.67  on 394  degrees of freedom
-    ## Residual deviance: 539.69  on 393  degrees of freedom
-    ## AIC: 543.69
-    ## 
-    ## Number of Fisher Scoring iterations: 4
-
-``` r
-#glm with house-finch alone against positivity rate
+#glm: house-finch correlated with WNV positivity rate of pools?
 glm2 <- glm(loc_rate ~ host_House_finch,
             data = counts_matrix)
 summary(glm2)

@@ -1,0 +1,90 @@
+---
+title: "Linear Regression"
+author: "Norah Saarman"
+date: "`r Sys.Date()`"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Loading the data
+
+```{r loading data}
+
+# load data
+life_expectancy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2023/2023-12-05/life_expectancy.csv')
+```
+
+## (Optional) Sneak Peak For Lecture
+
+```{r optional}
+# Scatterplot with line of best fit
+plot(life_expectancy$Year[life_expectancy$Year > 1883],life_expectancy$LifeExpectancy[life_expectancy$Year > 1883], pch = 19, col = "grey", xlab = "Year of Birth", ylab = "Life Expectancy")
+abline(lm(LifeExpectancy ~ Year, data = life_expectancy[life_expectancy$Year > 1883,]), lt = 1)
+```
+
+# Linear regression: Before 1883, after 1883
+
+In 1883, Koch identified and isolated the *Vibrio cholerae* bacterium in pure culture, a discovery previously made by Filippo Pacini in 1854 but not widely recognized. Koch's findings provided the definitive scientific proof needed to firmly establish the germ theory for cholera and many other diseases and was the beginning of the modern medical era.
+
+```{r regression}
+# Linear regression years before 1883 (Koch's germ theory)
+lm_b1883 <- lm(LifeExpectancy ~ Year, data = life_expectancy[life_expectancy$Year < 1883,])
+summary(lm_b1883)
+
+# Linear regression years after 1883 (Koch's germ theory)
+lm_a1883 <- lm(LifeExpectancy ~ Year, data = life_expectancy[life_expectancy$Year > 1883,])
+summary(lm_a1883)
+```
+
+# Scatterplot with line(s) of best fit
+
+```{r scatterplot}
+plot(life_expectancy$Year,life_expectancy$LifeExpectancy, pch = 19, col = "grey", xlab = "Year of Birth", ylab = "Life Expectancy")
+abline(lm_b1883, lt = 3)
+abline(lm_a1883, lt = 1)
+```
+
+# Homework Questions:
+
+## Q1. How significant is the linear relationship between life expectancy and year of birth?
+
+-   What do the p-values in each model summary tell you about the statistical significance of the relationship?
+
+-   Compare across:
+
+    (a) Before 1883
+
+    (b) After 1883
+
+*Hint: Look at the Pr(\>\|t\|) column for the Year variable in each summary() output.*
+
+## Q2. What is the slope of the linear regression line in each model?
+
+-   Report the estimated slope from the regression output (the coefficient for Year).
+
+-   Interpret it: How much does life expectancy change per year of birth?
+
+-   Compare across:
+
+    (a) Before 1883
+
+    (b) After 1883
+
+*Hint: A higher slope means faster improvement in life expectancy.*
+
+## Q3. What might explain changes in the rate of increase in life expectancy through the years, especially before and after 1883?
+
+Possible real-world factors to consider:
+
+-   Improvements in medicine, public health, and sanitation.
+
+-   Major historical events (wars, pandemics).
+
+-   Industrialization and technological progress
+
+You can also refer to insights from the [Our World in Data](https://ourworldindata.org/life-expectancy?insight=life-expectancy-has-surpassed-predictions-again-and-again#key-insights) article on the topic.

@@ -1,5 +1,5 @@
 ---
-title: "Warm-up mini-Report: Mosquito Blood Hosts in \n Salt Lake City, Utah"
+title: "Warm-up mini-Report (Updated): Mosquito Blood Hosts in \n Salt Lake City, Utah"
 author: "Norah Saarman"
 date: "`r Sys.Date()`"
 output:
@@ -148,7 +148,7 @@ barplot(height = counts0,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (-)",
+        main = "Sites WNV (-)",
         xlim = xlim_use)
 
 ## Panel B: WNV detected (loc_positives = 1)
@@ -160,7 +160,7 @@ barplot(height = counts1,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (+)",
+        main = "Sites WNV (+)",
         xlim = xlim_use)
 
 par(op)
@@ -170,19 +170,37 @@ host_species_colors <- species_colors
 ```
 ## Fill in 2nd analysis/plot e.g. generalized linear model
 
-Fill in here... Explain that you tested whether the presence or number of house finch blood meals predicts whether a site had WNV-positive pools (binary) or a higher WNV positivity rate (numeric). Mention that this statistical test lets you formally evaluate the relationship suggested by the barplots.
+Fill in here... Explain that you tested whether the presence or number of house finch blood meals predicts whether a site had higher WNV positivity rate in tested mosquito pools. Mention that this statistical test lets you formally evaluate the relationship suggested by the barplots.
 
-```{r}
-# second-analysis-or-plot, glm with house finch alone against binary +/_
-glm1 <- glm(loc_positives ~ host_House_finch,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
+```{r second-analysis-or-plot}
 
-#glm with house-finch alone against positivity rate
+#glm: house-finch correlated with WNV positivity rate of pools?
 glm2 <- glm(loc_rate ~ host_House_finch,
             data = counts_matrix)
 summary(glm2)
+
+
+# Basic boxplot
+boxplot(loc_rate ~ host_House_finch, 
+        data = counts_matrix,
+        main = "Location Rate by House Finch Count",
+        xlab = "Host_House_finch (Count 1–12)",
+        ylab = "Location Rate",
+        col = "lightblue",
+        border = "darkblue")
+abline(glm2, col = "darkblue")
+
+
+# Basic scatterplot
+plot(loc_rate ~ host_House_finch, 
+        data = counts_matrix,
+        main = "Location Rate by House Finch Count",
+        xlab = "Host_House_finch (Count 1–12)",
+        ylab = "Location Rate",
+        col = "lightblue",
+        border = "darkblue")
+abline(glm2, col = "darkblue")
+
 ```
 
 ## Optional 3rd analysis/plot e.g. heatmap

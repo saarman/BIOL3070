@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Barplots of blood meal ID by trap locations with/without WNV positive mosquito pools
 
 Horizontal plots:
-```{r horiz-plot,fig.align='left',fig.width=7,fig.height=7, warning=FALSE}
+```{r first-analysis, warning=FALSE}
 ## import counts_matrix: data.frame with column 'loc_positives' (0/1) and host columns 'host_*'
 counts_matrix <- read.csv("./bloodmeal_plusWNV_for_BIOL3070.csv")
 
@@ -85,7 +85,7 @@ barplot(height = counts0,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (-)",
+        main = "Sites WNV (-)",
         xlim = xlim_use)
 
 ## Panel B: WNV detected (loc_positives = 1)
@@ -97,7 +97,7 @@ barplot(height = counts1,
         horiz = TRUE,
         las = 1,
         xlab = "Bloodmeal counts",
-        main = "Locations WNV (+)",
+        main = "Sites WNV (+)",
         xlim = xlim_use)
 
 par(op)
@@ -106,10 +106,26 @@ par(op)
 host_species_colors <- species_colors
 ```
 
+# Generalized Linear Modeling (GLM)
 
-# Map of hotspots of house finches and WNV positive pools
+House finch GLM: 
 
-Salt Lake City Mosquito Abatement Surveillance: 
+Is occurrence of house finch in blood meals associated with locations WNV positivity rate in tested mosquito pools? 
+
+```{r second-analysis-or-plot}
+
+#glm: house-finch correlated with WNV positivity rate of pools?
+glm2 <- glm(loc_rate ~ host_House_finch,
+            data = counts_matrix)
+summary(glm2)
+```
+
+Answer: YES. Statistically significant association. 
+
+Possible caveats? Limitations?
+
+# OPTIONAL: Map of hotspots of house finches and WNV positive pools
+
 ```{r, warning=FALSE}
 library(dplyr)
 library(tidyr)
@@ -156,26 +172,6 @@ ggplot(hm, aes(long, lat)) +
 ```
 
 
-# GLM: Generalized Linear Modeling
 
-House finch GLM: 
-
-Does house finch have an effect by location positive +/- (binary)? by location positivity rate? 
-
-```{r}
-#glm with house finch alone against binary +/_
-glm1 <- glm(loc_positives ~ host_House_finch,
-            data = counts_matrix,
-            family = binomial)
-summary(glm1)
-
-#glm with house-finch alone against positivity rate
-glm2 <- glm(loc_rate ~ host_House_finch,
-            data = counts_matrix)
-summary(glm2)
-```
-Answer: YES. Statistically significant association. 
-
-Possible caveats? Limitations?
 
 
