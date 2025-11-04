@@ -69,7 +69,7 @@ House finches are acting as important amplifying hosts of WNV in Salt Lake City.
 ## Prediction(s)
 Sites with more house finch blood meals have higher WNV positivity rates. Therefore, I predict that house finch blood-meal counts will be positively associated with WNV-positive pool rate.
 
-# MOTHODS AND RESULTS
+# METHODS AND RESULTS
 
 We sequenced the vertebrate blood meals of Culex mosquitoes collected from Salt Lake City to identify their avian hosts. PCR amplification used vertebrate-universal primers targeting a 658-bp region of the mitochondrial cytochrome oxidase I (COI) gene, and host identities were confirmed by sequence comparison to GenBank. Using these results, we summarized host blood-meal counts by whether a site had any WNV-positive pools and compared host composition with paired horizontal bar plots. We then tested whether house finch blood-meal counts predicted the site-level WNV positivity rate using a linear model, and visualized spatial hotspots for WNV positivity and house finch blood meals to assess geographic overlap.
 
@@ -210,7 +210,7 @@ abline(glm2, col = "darkblue")
 
 This analysis and the plot show that the regression coefficient for house finch blood meals was positive (β ≈ 0.03 ± 0.006, p = 4.54e-05), indicating a highly statistically significant increase in WNV positivity rate with higher house finch representation. This supports the hypothesis that feeding on house finches contributes to local virus amplification.
 
-## Analysis 3: Spatial overlap of WNV and host hotspots
+## Optional Analysis 3: Spatial overlap of WNV and host hotspots
 
 Finally, we visualized spatial hotspots of both WNV-positive pools and house finch blood meals to assess geographic overlap in potential risk areas. Site coordinates (latitude, longitude) were used to generate kernel density maps using the ggplot2 and maps packages in R. These smoothed density surfaces allow comparison of high-intensity zones for mosquito–host interactions and WNV activity, providing a spatial context for the observed relationships.
 

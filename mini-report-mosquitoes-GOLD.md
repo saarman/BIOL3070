@@ -9,14 +9,14 @@ Norah Saarman
   - [Question(s)](#questions)
   - [Hypothesis](#hypothesis)
   - [Prediction(s)](#predictions)
-- [MOTHODS AND RESULTS](#mothods-and-results)
+- [METHODS AND RESULTS](#methods-and-results)
   - [Analysis 1: Bar plots of host composition by WNV
     status](#analysis-1-bar-plots-of-host-composition-by-wnv-status)
   - [Analysis 2: Relationship between house finch blood meals and WNV
     positivity
     rate](#analysis-2-relationship-between-house-finch-blood-meals-and-wnv-positivity-rate)
-  - [Analysis 3: Spatial overlap of WNV and host
-    hotspots](#analysis-3-spatial-overlap-of-wnv-and-host-hotspots)
+  - [Optional Analysis 3: Spatial overlap of WNV and host
+    hotspots](#optional-analysis-3-spatial-overlap-of-wnv-and-host-hotspots)
 - [DISCUSSION](#discussion)
   - [Analysis 1: Host composition by WNV
     presence](#analysis-1-host-composition-by-wnv-presence)
@@ -24,7 +24,7 @@ Norah Saarman
     positivity
     rate](#analysis-2-relationship-between-house-finch-blood-meals-and-wnv-positivity-rate-1)
   - [Optional Analysis 3: Spatial overlap of WNV and host
-    hotspots](#optional-analysis-3-spatial-overlap-of-wnv-and-host-hotspots)
+    hotspots](#optional-analysis-3-spatial-overlap-of-wnv-and-host-hotspots-1)
 - [CONCLUSION](#conclusion)
 - [REFERENCES](#references)
 
@@ -120,7 +120,7 @@ Sites with more house finch blood meals have higher WNV positivity
 rates. Therefore, I predict that house finch blood-meal counts will be
 positively associated with WNV-positive pool rate.
 
-# MOTHODS AND RESULTS
+# METHODS AND RESULTS
 
 We sequenced the vertebrate blood meals of Culex mosquitoes collected
 from Salt Lake City to identify their avian hosts. PCR amplification
@@ -348,7 +348,7 @@ rate with higher house finch representation. This supports the
 hypothesis that feeding on house finches contributes to local virus
 amplification.
 
-## Analysis 3: Spatial overlap of WNV and host hotspots
+## Optional Analysis 3: Spatial overlap of WNV and host hotspots
 
 Finally, we visualized spatial hotspots of both WNV-positive pools and
 house finch blood meals to assess geographic overlap in potential risk
