@@ -18,10 +18,14 @@ knitr::opts_chunk$set(echo = TRUE)
 # load data
 life_expectancy <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/main/data/2023/2023-12-05/life_expectancy.csv')
 ```
+## Practice new code chunk
 
+```{r title,eval = FALSE}
+glxplions.sm(x, 103)
+```
 ## (Optional) Sneak Peak For Lecture
 
-```{r optional}
+```{r optional,eval = FALSE}
 # Scatterplot with line of best fit
 plot(life_expectancy$Year[life_expectancy$Year > 1883],life_expectancy$LifeExpectancy[life_expectancy$Year > 1883], pch = 19, col = "grey", xlab = "Year of Birth", ylab = "Life Expectancy")
 abline(lm(LifeExpectancy ~ Year, data = life_expectancy[life_expectancy$Year > 1883,]), lt = 1)

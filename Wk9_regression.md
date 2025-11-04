@@ -1,9 +1,10 @@
 Linear Regression
 ================
 Norah Saarman
-2025-10-20
+2025-10-30
 
 - [Loading the data](#loading-the-data)
+  - [Practice new code chunk](#practice-new-code-chunk)
   - [(Optional) Sneak Peak For
     Lecture](#optional-sneak-peak-for-lecture)
 - [Linear regression: Before 1883, after
@@ -36,6 +37,12 @@ life_expectancy <- readr::read_csv('https://raw.githubusercontent.com/rfordatasc
     ## ℹ Use `spec()` to retrieve the full column specification for this data.
     ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
 
+## Practice new code chunk
+
+``` r
+glxplions.sm(x, 103)
+```
+
 ## (Optional) Sneak Peak For Lecture
 
 ``` r
@@ -43,8 +50,6 @@ life_expectancy <- readr::read_csv('https://raw.githubusercontent.com/rfordatasc
 plot(life_expectancy$Year[life_expectancy$Year > 1883],life_expectancy$LifeExpectancy[life_expectancy$Year > 1883], pch = 19, col = "grey", xlab = "Year of Birth", ylab = "Life Expectancy")
 abline(lm(LifeExpectancy ~ Year, data = life_expectancy[life_expectancy$Year > 1883,]), lt = 1)
 ```
-
-![](Wk9_regression_files/figure-gfm/optional-1.png)<!-- -->
 
 # Linear regression: Before 1883, after 1883
 
