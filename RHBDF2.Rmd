@@ -1,0 +1,116 @@
+---
+title: "Group 6 Help (simulated data)"
+author: "Norah Saarman"
+date: "`r Sys.Date()`"
+output:
+  github_document:
+    toc: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# ABSTRACT
+
+
+# BACKGROUND
+
+```{r background, include=TRUE, eval=TRUE}
+#background
+```
+
+# STUDY QUESTION and HYPOTHESIS
+
+## Question(s)  
+
+
+## Hypothesis 
+
+  
+## Prediction(s)
+
+
+# METHODS AND RESULTS
+
+Data simulated and given to us by instructor, based on https://doi.org/10.1158/1078-0432.CCR-10-3028... The original paper [did what?]...
+
+
+## Analysis 1: Visualize with a Boxplot
+
+First, we visualized the impact of RHBDF2 genotype on normalized pain relief...
+
+```{r boxplot}
+library(ggplot2)
+library(dplyr)
+
+# Read in simulated data
+dat <- read.csv("epos_style_rs12948783_simulated_large.csv")
+
+dat$carrier <- factor(dat$carrier, levels = c("AA_or_GA","GG"))
+
+means <- dat %>%
+  group_by(carrier) %>%
+  summarise(m = mean(norm_pain_relief), .groups = "drop")
+
+p2 <- ggplot(dat, aes(carrier, norm_pain_relief)) +
+  geom_boxplot(width = 0.55, outlier.shape = NA) +
+  geom_jitter(width = 0.15, alpha = 0.15, size = 0.8) +
+  stat_summary(fun = mean, geom = "point", size = 3) +
+  stat_summary(fun.data = mean_se, geom = "errorbar", width = 0.15) +
+  geom_segment(data = data.frame(x = 1, xend = 2,
+                                 y = means$m[means$carrier=="AA_or_GA"],
+                                 yend = means$m[means$carrier=="GG"]),
+               aes(x = x, xend = xend, y = y, yend = yend)) +
+  coord_cartesian(ylim = c(80, 110)) +
+  labs(x = "rs12948783 (AA/GA vs GG)",
+       y = "Normalized pain relief (%)") +
+  theme_classic(base_size = 13)
+
+p2
+# ggsave("boxplot_collapsed.png", p2, width = 5, height = 4, dpi = 300)
+```
+Next, we performed an ANOVA to test if pain relief was statistically different between the different RHBDF2 genotypes.
+
+```{r anova, warning=FALSE}
+
+# One-way ANOVA (3 genotypes):
+dat$genotype <- factor(dat$genotype, levels = c("AA","GA","GG"))
+summary(aov(norm_pain_relief ~ genotype, data = dat))
+TukeyHSD(aov(norm_pain_relief ~ genotype, data = dat))
+
+
+#Two-group ANOVA (AA/GA vs GG), matching the figure:
+dat$carrier <- factor(dat$carrier, levels = c("AA_or_GA","GG"))
+summary(aov(norm_pain_relief ~ carrier, data = dat))
+
+# 2-way ANOVA with sex as a covariate:
+summary(aov(norm_pain_relief ~ genotype + sex, data = dat))
+```  
+The results show...
+
+
+## Analysis 2: 
+
+
+# DISCUSSION
+
+Results from this analysis...
+  
+## Analysis 1: Boxplot and ANOVA
+
+  
+## Analysis 2: 
+
+
+
+# CONCLUSION
+
+
+# REFERENCES     
+
+1. Galvan, A., Skorpen, F., Klepstad, P., Knudsen, A. K., Fladvad, T., Falvella, F. S., Pigni, A., Brunelli, C., Caraceni, A., Kaasa, S., & Dragani, T. A. (2011). Multiple loci modulate opioid therapy response for cancer pain. Clinical Cancer Research, 17(13), 4581–4587. https://doi.org/10.1158/1078-0432.CCR-10-3028 
+
+2. ChatGPT. OpenAI, version Jan 2025. Used as a reference for... and to correct syntax errors... and... Accessed `r Sys.Date()`.
+
+
+
