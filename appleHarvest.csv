@@ -1,0 +1,242 @@
+ObjectID,treeType,pruned,harvest,elevation,city,year
+44,Apple,Yes,Normal,5663,Heber City ,2005
+87,Apple,Yes,Normal,5580,MIDWAY,1990
+88,Apple,Yes,Above average,5580,MIDWAY,1992
+89,Apple,Yes,Minimal,5580,MIDWAY,2021
+195,Apple,No,Minimal,5500,Midway,1990
+252,Apple,Yes,Minimal,5663,Heber City,2019
+253,Apple,Yes,Minimal,5663,Heber City,2019
+102,Apple,Yes,Minimal,5700,Daniel,2002
+101,Apple,Yes,Normal,5700,Daniel,2002
+100,Apple,Yes,Normal,5700,Daniel,2002
+99,Apple,Yes,Normal,5700,Daniel,2002
+98,Apple,Yes,Normal,5700,Daniel,2002
+97,Apple,Yes,Normal,5700,Daniel,2002
+96,Apple,Yes,Normal,5700,Daniel,2002
+95,Apple,Yes,Normal,5700,Daniel,2002
+94,Apple,Yes,Normal,5700,Daniel,2002
+93,Apple,Yes,Normal,5700,Daniel,2002
+165,Apple,Yes,Minimal,5700,Daniel,2002
+173,Apple,Yes,,5700,Daniel,2002
+174,Apple,Yes,,5700,Daniel,2002
+175,Apple,Yes,Minimal,5700,Daniel,2002
+176,Apple,Yes,,5700,Daniel,2002
+177,Apple,Yes,Minimal,5700,Daniel,2002
+178,Apple,Yes,Minimal,5700,Daniel,2002
+179,Apple,Yes,Normal,5700,Daniel,2002
+180,Apple,Yes,Minimal,5604,Heber City,2018
+181,Apple,Yes,Minimal,5604,Heber City ,2018
+182,Apple,Yes,Minimal,5604,Heber City,2018
+183,Apple,Yes,,5604,Heber City,2018
+184,Apple,Yes,,5604,Heber City ,2018
+118,Apple,No,Above average,5600,Heber City,1974
+119,Apple,Yes,Minimal,5600,Heber City,2016
+120,Apple,Yes,,5600,Heber City,2018
+121,Apple,Yes,Normal,5600,Heber City,1924
+123,Apple,Yes,Minimal,5600,Heber City,1924
+124,Apple,Yes,Minimal,5600,Heber City,1924
+125,Apple,No,Above average,5600,Heber City,2016
+126,Apple,No,,5600,Heber City,1974
+127,Apple,No,,5600,Heber City,1974
+128,Apple,No,,5600,Heber City,1924
+129,Apple,Yes,Minimal,5600,Heber City,1924
+131,Apple,Yes,Minimal,5600,Heber City,1924
+132,Apple,Yes,Minimal,5600,Heber City,1924
+134,Apple,Yes,Minimal,5600,Heber City,1924
+139,Apple,Yes,Minimal,5600,Heber City,1924
+260,Apple,No,Above average,5550,Heber City,1905
+262,Peach,Yes,,5550,Heber City,2022
+203,Apple,Yes,Minimal,5550,Heber City,2017
+204,Apple,Yes,Minimal,5600,MIDWAY,2017
+209,Apple,Yes,Minimal,5600,MIDWAY,1980
+210,Apple,Yes,Normal,5600,MIDWAY,1977
+211,Apple,Yes,Minimal,5600,MIDWAY,1977
+112,Apple,No,Minimal,5600,MIDWAY,1980
+113,Apple,No,Minimal,6710,Woodland,1950
+115,Apple,No,Normal,6710,Woodland,1980
+114,Apple,No,,6710,Woodland,2023
+217,Apple,No,Normal,6710,Woodland,1980
+297,Apple,No,Normal,6720,WOODLAND,1950
+298,Apple,No,Normal,5600,Midway,1930
+299,Apple,Yes,Normal,5600,Midway,1935
+300,Apple,Yes,Normal,5600,Midway,1970
+301,Apple,Yes,Normal,5600,Midway,1970
+302,Apple,Yes,Normal,5600,Midway,1980
+303,Apple,Yes,Normal,5600,Midway,1970
+2,Apple,Yes,Above average,5600,Midway,1993
+3,Apple,Yes,Normal,5633,Midway,1993
+6,Apple,Yes,Normal,5633,Midway,1993
+4,Apple,Yes,Normal,5585,Midway,1993
+15,Apple,Yes,,5633,Midway,2023
+16,Apple,Yes,Normal,6080,Heber City,2018
+171,Apple,No,Minimal,6080,Heber City,2019
+196,Apple,No,,6000,Heber City,2024
+221,Apple,No,Normal,5770,Midway ,1950
+219,Apple,No,Normal,5600,Midway,1950
+213,Apple,No,Normal,5600,Midway,1950
+224,Apple,No,Normal,5600,Midway,1950
+17,Apple,Yes,,5600,Midway,2019
+21,Apple,Yes,,5663,Heber City,2013
+18,Apple,No,,5663,Heber City,2010
+19,Apple,Yes,,5663,Heber City,2010
+8,Apple,Yes,Normal,5663,Heber City,2024
+192,Apple,No,Normal,5400,Midway,2014
+39,Apple,Yes,Minimal,5400,Midway,1995
+40,Apple,Yes,Minimal,5663,Heber City ,1995
+41,Apple,Yes,Normal,5663,Heber City ,1995
+38,Apple,Yes,Minimal,5663,Heber City ,2008
+35,Apple,Yes,Minimal,5663,Heber City ,2008
+43,Apple,Yes,Normal,5663,Heber City,2005
+162,Apple,Yes,Minimal,5663,Heber City ,2006
+45,Apple,Yes,Minimal,5663,Heber City ,2005
+49,Apple,Yes,Normal,5663,Heber City ,1995
+53,Apple,Yes,Normal,5663,Heber city,1995
+46,Apple,Yes,Normal,5663,Heber City ,1995
+54,Apple,Yes,Minimal,5663,Heber City ,2010
+55,Apple,Yes,,5663,Heber City,2010
+48,Apple,Yes,Minimal,5663,Heber City ,2015
+163,Apple,Yes,Normal,5663,Heber City,2003
+172,Apple,No,Minimal,5663,Heber City ,2019
+265,Apple,Yes,Minimal,6000,Heber City,2007
+266,Apple,Yes,,6500,Kamas,2007
+267,Apple,Yes,,6500,Kamas,2014
+188,Apple,Yes,Normal,6500,Kamas,1999
+189,Apple,No,Minimal,7162,Park City,1964
+111,Apple,Yes,Normal,7200,Park City,1978
+166,Apple,No,Minimal,6700,Park City,2008
+167,Apple,No,Minimal,6500,Park City (South Snyderville),2008
+190,Apple,Yes,Normal,6500,Park City (South Snyderville),2007
+109,Apple,Yes,,7000,Park City (Summit Park),2015
+108,Apple,Yes,,6692,Park City (Silver Creek),2015
+103,Apple,Yes,,6692,Park City (Silver Creek),2015
+106,Apple,Yes,,6692,Park City (Silver Creek),2015
+71,Apple,Yes,Minimal,6692,Park City (Silver Creek),2015
+107,Apple,Yes,,6692,Park City (Silver Creek),2015
+110,Apple,Yes,,6692,Park City (Silver Creek),2015
+194,Apple,Yes,Normal,6692,Park City (Silver Creek),2019
+5,Apple,Yes,Above average,5750,MIdway,2000
+186,Apple,Yes,Minimal,5750,MIdway,2023
+187,Apple,Yes,Minimal,5784,Heber City,2023
+52,Apple,Yes,Normal,5784,Heber City,2015
+50,Apple,Yes,Normal,5663,Heber City ,2005
+51,Apple,Yes,Normal,5663,Heber City,2005
+56,Apple,Yes,,5663,Heber City ,2010
+47,Apple,Yes,Normal,5663,Heber City ,2015
+164,Apple,Yes,Minimal,5663,Heber City ,1995
+37,Apple,Yes,Minimal,5663,Heber City ,2008
+36,Apple,Yes,Minimal,5663,Heber City ,2008
+22,Apple,No,,5663,Heber City ,2006
+23,Apple,No,Minimal,6700,Marion,2006
+24,Apple,No,,6700,Marion,2006
+25,Apple,No,Minimal,6700,Marion,2006
+26,Apple,No,,6700,Marion,2006
+27,Apple,No,,6700,Marion,2006
+28,Apple,No,,6700,Marion,2006
+29,Apple,No,,6700,Marion,2006
+228,Apple,No,Minimal,6700,Marion,2018
+282,Apple,No,Normal,5580,Heber City,1900
+281,Apple,No,Normal,6000,Midway,1900
+287,Apple,No,Normal,6000,Midway,1900
+288,Apple,No,Normal,6000,Midway,1900
+280,Apple,No,,6000,Midway,1900
+279,Apple,No,Minimal,6000,Midway,2005
+278,Apple,No,,6000,Midway,1900
+277,Apple,No,Normal,6000,Midway,1900
+292,Apple,No,Normal,6000,Midway,1900
+293,Apple,No,Minimal,6000,Midway,1900
+294,Apple,No,Minimal,6000,Midway,1900
+295,Apple,No,Minimal,6000,Midway,1900
+283,Apple,No,,6000,Midway,1900
+284,Apple,No,,6000,Midway,1900
+286,Apple,No,Normal,6000,Midway,1900
+285,Apple,No,Normal,6000,Midway,1900
+291,Apple,No,,6000,Midway,1900
+276,Apple,No,Normal,6000,Midway,1900
+274,Apple,No,,6000,Midway,1900
+273,Apple,No,,6000,Midway,1900
+122,Apple,No,Normal,6000,Midway,2024
+30,Apple,No,,5770,Midway,2006
+130,Apple,No,Minimal,6700,Marion,1984
+202,Apple,No,Minimal,6500,Fruitland ,1950
+11,Apple,No,Normal,6500,Daniel,2010
+10,Apple,No,Normal,6500,Midway,2010
+9,Apple,No,Normal,6500,Midway,2028
+215,Apple,No,,6500,Midway,1950
+73,Apple,Yes,,5600,Midway,2023
+74,Apple,Yes,,6500,Park City,2023
+75,Apple,Yes,,6500,Park City,2023
+76,Apple,Yes,,6500,Park City,2023
+77,Apple,Yes,,6500,Park City,2023
+79,Apple,Yes,,6500,Park City,2023
+78,Apple,Yes,,6500,Park City,2023
+82,Apple,Yes,,6500,Park City,2023
+81,Apple,Yes,,6500,Park City,2023
+80,Apple,Yes,,6500,Park City,2023
+191,Apple,No,Minimal,6500,Park City,1930
+255,Apple,No,,5900,Wanship,1930
+258,Apple,Yes,,5800,Coalville,1985
+254,Apple,No,,5800,Coalville,1980
+256,Apple,Yes,,5800,Coalville,1985
+146,Apple,Yes,,5800,Coalville,2020
+147,Apple,Yes,,6722,Woodland,2020
+216.5,Apple,Yes,,6722,Woodland,2020
+148,Apple,Yes,,6722,Woodland,2020
+149,Apple,Yes,,6722,Woodland,2020
+150,Apple,Yes,,6722,Woodland,2020
+151,Apple,Yes,,6722,Woodland,2020
+152,Apple,Yes,,6722,Woodland,2020
+153,Apple,Yes,,6722,Woodland,2020
+154,Apple,Yes,,6722,Woodland,2020
+155,Apple,Yes,,6722,Woodland,2023
+156,Apple,Yes,,6722,Woodland,2023
+133,Apple,No,,6722,Woodland,1985
+135,Apple,No,,6722,Woodland,1985
+136,Apple,Yes,,6722,Woodland,2019
+137,Apple,Yes,,6722,Woodland,2019
+138,Apple,Yes,,6722,Woodland,2021
+141,Apple,Yes,,6722,Woodland,2021
+142,Apple,Yes,,6722,Woodland,2021
+143,Apple,Yes,,6722,Woodland,2021
+144,Apple,Yes,,6722,Woodland,2021
+145,Apple,Yes,,6722,Woodland,2023
+85,Apple,Yes,,6722,Woodland,2023
+83,Apple,Yes,,6500,Park City,2023
+86,Apple,Yes,Minimal,6500,Park City,2023
+216,Apple,No,,6500,Park City,1950
+226,Apple,No,Minimal,5600,Midway,1950
+222,Apple,No,Normal,5600,Midway,1950
+214,Apple,No,Minimal,5600,Midway,1950
+296,Apple,No,,5600,,1900
+232,Apple,No,Normal,6250,Midway,1995
+233,Apple,No,Normal,5770,Midway,1995
+234,Apple,Yes,,5770,Midway,1995
+208,Apple,No,,5770,Midway,2021
+68,Apple,No,,5600,MIDWAY,1949
+67,Apple,No,Minimal,5900,Wanship,1949
+72,Apple,Yes,Minimal,5900,Wanship,2020
+220,Apple,No,Minimal,5616,Heber City,1950
+225,Apple,No,Normal,5600,Midway,1950
+223,Apple,No,Normal,5600,Midway,1950
+229,Apple,Yes,Normal,5600,Midway,1940
+92,Apple,Yes,Above average,5600,Midway,1905
+212,Apple,No,Normal,5584,Midway,1950
+57,Apple,No,,5600,Midway,1974
+58,Apple,No,,5700,Midway,1974
+59,Apple,No,,5700,Midway,1974
+60,Apple,No,,5700,Midway,1974
+61,Apple,No,,5700,Midway,1974
+62,Apple,No,,5700,Midway,1974
+63,Apple,No,,5700,Midway,1974
+64,Apple,No,,5700,Midway,1974
+65,Apple,No,,5700,Midway,1974
+66,Apple,No,,5700,Midway,1974
+272,Apple,No,Normal,5700,Midway,1900
+271,Apple,No,Normal,6000,Midway,1900
+289,Apple,No,Normal,6000,Midway,1900
+290,Apple,No,Normal,6000,Midway,1900
+230,Apple,Yes,,6000,Midway,2022
+231,Apple,Yes,,5770,Midway,2022
+69,Apple,No,Normal,5770,Midway,2019
+70,Apple,No,Normal,5550,midway,2019
+159,Apple,No,Above average,5550,midway,1950
+158,Apple,No,Above average,5584,Midway,1950

@@ -180,3 +180,56 @@ A quasi-Poisson model may produce:
 – inflated Type I errors  
 ... because the model is misspecified relative to what the data actually are.  
 
+
+## Analysis 4 - Even better, one-sided rank sum test!
+Test if North > South
+```{r north more than south}
+wilcox.test(firefly_count ~ region, data = fireflies,
+            alternative = "greater")
+```
+This is because the median value is higher for the north, you should probably also report this!
+```{r median}
+tapply(fireflies$firefly_count, fireflies$region, median)
+
+```
+
+Regression comparing JulianDay_observed to year_observed to look for pattern of earlier peak observation day with climate change.
+
+```{r lm}
+library(dplyr)
+
+peak_days <- fireflies %>%
+  group_by(year_observed) %>%
+  summarize(
+    peak_day = JulianDay_observed[which.max(firefly_count)]
+  )
+
+library(ggplot2)
+
+ggplot(peak_days, aes(x = year_observed, y = peak_day)) +
+  geom_point(size = 3) +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(
+    x = "Year",
+    y = "Peak Observation Day (Julian Day)",
+    title = "Trend in Peak Firefly Observation Day"
+  ) +
+  theme_minimal()
+
+
+model <- lm(peak_day ~ year_observed, data = peak_days)
+summary(model)
+
+```
+
+How about to match only the years that the citizen sience was reported, so as not to rely on memory from past years.
+
+```{r lm 2014 onwards}
+peak_days_subset <- subset(peak_days,
+                           year_observed >= 2014 &
+                           year_observed <= 2025)
+
+model <- lm(peak_day ~ year_observed, data = peak_days_subset)
+summary(model)
+
+```
