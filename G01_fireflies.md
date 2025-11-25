@@ -11,6 +11,8 @@ Norah Saarman
     normality](#2nd-analysis---shapiro-wilk-test-for-normality)
   - [3rd Analysis - Wilcoxon Rank-Sum
     test](#3rd-analysis---wilcoxon-rank-sum-test)
+  - [Analysis 4 - Even better, one-sided rank sum
+    test!](#analysis-4---even-better-one-sided-rank-sum-test)
 
 # First explore the data
 
@@ -232,3 +234,29 @@ A quasi-Poisson model may produce:
 – inflated Type I errors  
 … because the model is misspecified relative to what the data actually
 are.
+
+## Analysis 4 - Even better, one-sided rank sum test!
+
+Test if North \> South
+
+``` r
+wilcox.test(firefly_count ~ region, data = fireflies,
+            alternative = "greater")
+```
+
+    ## 
+    ##  Wilcoxon rank sum test with continuity correction
+    ## 
+    ## data:  firefly_count by region
+    ## W = 23458, p-value = 0.09847
+    ## alternative hypothesis: true location shift is greater than 0
+
+This is because the median value is higher for the north, you should
+probably also report this!
+
+``` r
+tapply(fireflies$firefly_count, fireflies$region, median)
+```
+
+    ## north south 
+    ##   3.0   2.5

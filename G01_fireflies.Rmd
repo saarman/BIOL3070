@@ -180,3 +180,15 @@ A quasi-Poisson model may produce:
 – inflated Type I errors  
 ... because the model is misspecified relative to what the data actually are.  
 
+
+## Analysis 4 - Even better, one-sided rank sum test!
+Test if North > South
+```{r north more than south}
+wilcox.test(firefly_count ~ region, data = fireflies,
+            alternative = "greater")
+```
+This is because the median value is higher for the north, you should probably also report this!
+```{r median}
+tapply(fireflies$firefly_count, fireflies$region, median)
+
+```
